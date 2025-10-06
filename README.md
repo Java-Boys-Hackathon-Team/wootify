@@ -120,7 +120,11 @@ http://localhost:8080
 ## 🏆 Участие в хакатоне
 
 **Конкурс:** [WOOFi ✖ DeFrens ✖ GoMining — Trading-Bot Competition](https://dzen.ru/a/aMk0SZnSS0UlmR0F)
+
+
 **Период торговли:** 29 сентября — 31 октября 2025
+
+
 **Номинации:**
 
 * 🧠 Самый креативный бот
