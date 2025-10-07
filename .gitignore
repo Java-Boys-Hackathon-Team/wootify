@@ -267,3 +267,4 @@ vite.generated.ts
 webpack.generated.js
 
 .idea/
+.env
