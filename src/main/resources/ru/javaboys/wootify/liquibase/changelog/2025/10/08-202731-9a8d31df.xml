@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1" author="wootify">
+        <createTable tableName="POSITION_">
+            <column name="ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_POSITION_"/>
+            </column>
+            <column name="TIMESTAMP_" type="DATETIME"/>
+            <column name="SYMBOL_ID" type="UUID"/>
+            <column name="POSITION_QTY" type="DECIMAL(19, 10)"/>
+            <column name="SETTLE_PRICE" type="DECIMAL(19, 10)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="2" author="wootify">
+        <createIndex indexName="IDX_POSITION__SYMBOL" tableName="POSITION_">
+            <column name="SYMBOL_ID"/>
+        </createIndex>
+
+        <addForeignKeyConstraint baseColumnNames="SYMBOL_ID" baseTableName="POSITION_"
+                                 constraintName="FK_POSITION__ON_SYMBOL" referencedColumnNames="ID"
+                                 referencedTableName="SYMBOL"/>
+    </changeSet>
+</databaseChangeLog>
