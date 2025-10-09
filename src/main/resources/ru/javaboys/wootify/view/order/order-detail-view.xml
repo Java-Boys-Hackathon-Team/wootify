@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://orderDetailView.title"
+      focusComponent="form">
+    <data>
+        <instance id="orderDc"
+                  class="ru.javaboys.wootify.entity.Order">
+            <fetchPlan extends="_base">
+                <property name="account" fetchPlan="_base"/>
+                <property name="apiKey" fetchPlan="_base"/>
+                <property name="position" fetchPlan="_base"/>
+                <property name="symbol" fetchPlan="_base"/>
+            </fetchPlan>
+            <loader id="orderDl"/>
+        </instance>
+    </data>
+    <facets>
+        <dataLoadCoordinator auto="true"/>
+    </facets>
+    <actions>
+        <action id="saveAction" type="detail_saveClose"/>
+        <action id="closeAction" type="detail_close"/>
+    </actions>
+    <layout>
+        <formLayout id="form" dataContainer="orderDc">
+            <responsiveSteps>
+                <responsiveStep minWidth="0" columns="1"/>
+                <responsiveStep minWidth="40em" columns="2"/>
+            </responsiveSteps>
+            <dateTimePicker id="createdDateField" property="createdDate"/>
+            <dateTimePicker id="sendingDateField" property="sendingDate"/>
+            <dateTimePicker id="closedDateField" property="closedDate"/>
+            <entityPicker id="accountField" property="account">
+                <actions>
+                    <action id="entityLookupAction" type="entity_lookup"/>
+                    <action id="entityClearAction" type="entity_clear"/>
+                </actions>
+            </entityPicker>
+            <entityPicker id="apiKeyField" property="apiKey">
+                <actions>
+                    <action id="entityLookupAction" type="entity_lookup"/>
+                    <action id="entityClearAction" type="entity_clear"/>
+                </actions>
+            </entityPicker>
+            <entityPicker id="positionField" property="position">
+                <actions>
+                    <action id="entityLookupAction" type="entity_lookup"/>
+                    <action id="entityClearAction" type="entity_clear"/>
+                </actions>
+            </entityPicker>
+            <entityPicker id="symbolField" property="symbol">
+                <actions>
+                    <action id="entityLookupAction" type="entity_lookup"/>
+                    <action id="entityClearAction" type="entity_clear"/>
+                </actions>
+            </entityPicker>
+            <select id="typeField" property="type"/>
+            <select id="sideField" property="side"/>
+            <select id="statusField" property="status"/>
+            <textField id="quantityField" property="quantity"/>
+            <textField id="priceField" property="price"/>
+            <textField id="orderlyOrderIdField" property="orderlyOrderId"/>
+            <textField id="totalFeeField" property="totalFee"/>
+            <textField id="averageExecutedPriceField" property="averageExecutedPrice"/>
+            <textField id="totalExecutedQuantityField" property="totalExecutedQuantity"/>
+            <textField id="realizedPnlField" property="realizedPnl"/>
+        </formLayout>
+        <hbox id="detailActions">
+            <button id="saveAndCloseButton" action="saveAction"/>
+            <button id="closeButton" action="closeAction"/>
+        </hbox>
+    </layout>
+</view>

@@ -43,8 +43,11 @@
                 <responsiveStep minWidth="40em" columns="2"/>
             </responsiveSteps>
             <dateTimePicker id="createdDateField" property="createdDate"/>
-            <bigDecimalField property="positionQty" label="Quantity:" decimals="4"/>
-            <bigDecimalField property="settlePrice" decimals="4"/>
+            <dateTimePicker id="closedDateField" property="closedDate"/>
+            <numberField property="leverage" label="Leverage"/>
+            <bigDecimalField property="positionQty" decimals="4"/>
+            <bigDecimalField property="averageOpenPrice" decimals="4"/>
+            <bigDecimalField property="realizedPnl" decimals="4"/>
         </formLayout>
         <hbox id="detailActions">
             <button id="saveAndCloseButton" action="saveAction"/>
