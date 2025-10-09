@@ -10,7 +10,8 @@ public enum OrderStatus implements EnumClass<String> {
     NEW("NEW"),
     FILLED("FILLED"),
     PARTIAL_FILLED("PARTIAL_FILLED"),
-    CANCELLED("CANCELLED");
+    CANCELLED("CANCELLED"),
+    CREATED("CREATED");
 
     private final String id;
 
