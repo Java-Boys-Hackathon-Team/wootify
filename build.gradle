@@ -2,6 +2,7 @@ plugins {
     id 'io.jmix' version '2.6.2'
     id 'java'
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1.9'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -9,6 +10,10 @@ apply plugin: 'com.vaadin'
 
 jmix {
     bomVersion = '2.6.2'
+}
+
+ext {
+    springCloudVersion = '2025.0.0'
 }
 
 group = 'ru.javaboys'
@@ -37,7 +42,10 @@ dependencies {
     implementation 'io.jmix.datatools:jmix-datatools-flowui-starter'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
@@ -52,6 +60,12 @@ configurations.implementation {
     exclude group: 'com.vaadin', module: 'copilot'
 }
 
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
 test {
     useJUnitPlatform()
 }
@@ -59,6 +73,12 @@ test {
 idea {
     module {
         excludeDirs.addAll(files '.jmix', 'node_modules', 'src/main/frontend/generated/', 'src/main/bundles')
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
     }
 }
 
