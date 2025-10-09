@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1" author="wootify">
+        <addColumn tableName="POSITION_">
+            <column name="API_KEY_ID" type="UUID"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="2" author="wootify">
+        <addColumn tableName="API_KEY">
+            <column name="NAME" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="3" author="wootify">
+        <createIndex indexName="IDX_POSITION__API_KEY" tableName="POSITION_">
+            <column name="API_KEY_ID"/>
+        </createIndex>
+
+        <addForeignKeyConstraint baseColumnNames="API_KEY_ID" baseTableName="POSITION_"
+                                 constraintName="FK_POSITION__ON_API_KEY" referencedColumnNames="ID"
+                                 referencedTableName="API_KEY"/>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1" author="wootify">
+        <createTable tableName="API_KEY">
+            <column name="ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_API_KEY"/>
+            </column>
+            <column name="KEY_" type="VARCHAR(255)"/>
+            <column name="SECRET" type="VARCHAR(255)"/>
+            <column name="EXCHANGE_ID" type="VARCHAR(255)"/>
+            <column name="BROKER_ID" type="VARCHAR(255)"/>
+            <column name="ENV" type="VARCHAR(255)"/>
+            <column name="ACCOUNT_ID" type="UUID"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="2" author="wootify">
+        <createIndex indexName="IDX_API_KEY_ACCOUNT" tableName="API_KEY">
+            <column name="ACCOUNT_ID"/>
+        </createIndex>
+
+        <addForeignKeyConstraint baseColumnNames="ACCOUNT_ID" baseTableName="API_KEY"
+                                 constraintName="FK_API_KEY_ON_ACCOUNT" referencedColumnNames="ID"
+                                 referencedTableName="ACCOUNT"/>
+    </changeSet>
+</databaseChangeLog>

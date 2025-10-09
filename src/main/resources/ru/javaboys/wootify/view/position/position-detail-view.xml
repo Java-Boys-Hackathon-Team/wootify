@@ -31,14 +31,18 @@
             <entityPicker id="accountsPicker" dataContainer="positionDc" property="account">
                 <actions>
                     <action id="entityLookup" type="entity_lookup"/>
-                    <action id="entityOpen" type="entity_open"/>
+                </actions>
+            </entityPicker>
+            <entityPicker id="apiKeyPicker" dataContainer="positionDc" property="apiKey">
+                <actions>
+                    <action id="entityLookup" type="entity_lookup"/>
                 </actions>
             </entityPicker>
             <responsiveSteps>
                 <responsiveStep minWidth="0" columns="1"/>
                 <responsiveStep minWidth="40em" columns="2"/>
             </responsiveSteps>
-            <dateTimePicker id="timestampField" property="timestamp"/>
+            <dateTimePicker id="createdDateField" property="createdDate"/>
             <bigDecimalField property="positionQty" label="Quantity:" decimals="4"/>
             <bigDecimalField property="settlePrice" decimals="4"/>
         </formLayout>
