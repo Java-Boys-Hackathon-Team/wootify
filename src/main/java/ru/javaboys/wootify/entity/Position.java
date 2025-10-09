@@ -11,7 +11,8 @@ import java.util.UUID;
 @JmixEntity
 @Table(name = "POSITION_", indexes = {
         @Index(name = "IDX_POSITION__SYMBOL", columnList = "SYMBOL_ID"),
-        @Index(name = "IDX_POSITION__ACCOUNT", columnList = "ACCOUNT_ID")
+        @Index(name = "IDX_POSITION__ACCOUNT", columnList = "ACCOUNT_ID"),
+        @Index(name = "IDX_POSITION__API_KEY", columnList = "API_KEY_ID")
 })
 @Entity(name = "Position_")
 public class Position {
@@ -23,12 +24,16 @@ public class Position {
     @Column(name = "STATUS")
     private String status;
 
+    @JoinColumn(name = "API_KEY_ID")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private ApiKey apiKey;
+
     @JoinColumn(name = "ACCOUNT_ID")
     @ManyToOne(fetch = FetchType.LAZY)
     private Account account;
 
-    @Column(name = "TIMESTAMP_")
-    private LocalDateTime timestamp;
+    @Column(name = "CREATED_DATE")
+    private LocalDateTime createdDate;
 
     @JoinColumn(name = "SYMBOL_ID")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -39,6 +44,22 @@ public class Position {
 
     @Column(name = "SETTLE_PRICE", precision = 19, scale = 10)
     private BigDecimal settlePrice;
+
+    public ApiKey getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(ApiKey apiKey) {
+        this.apiKey = apiKey;
+    }
+
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
 
     public PositionStatus getStatus() {
         return status == null ? null : PositionStatus.fromId(status);
@@ -78,14 +99,6 @@ public class Position {
 
     public void setSymbol(Symbol symbol) {
         this.symbol = symbol;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
     }
 
     public UUID getId() {

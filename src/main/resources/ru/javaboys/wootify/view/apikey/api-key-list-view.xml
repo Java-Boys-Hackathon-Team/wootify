@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <view xmlns="http://jmix.io/schema/flowui/view"
       xmlns:c="http://jmix.io/schema/flowui/jpql-condition"
-      title="msg://positionListView.title"
-      focusComponent="positionsDataGrid">
+      title="msg://apiKeyListView.title"
+      focusComponent="apiKeysDataGrid">
     <data>
-        <collection id="positionsDc"
-                    class="ru.javaboys.wootify.entity.Position">
+        <collection id="apiKeysDc"
+                    class="ru.javaboys.wootify.entity.ApiKey">
             <fetchPlan extends="_base">
                 <property name="account" fetchPlan="_base"/>
-                <property name="symbol" fetchPlan="_base"/>
             </fetchPlan>
-            <loader id="positionsDl" readOnly="true">
+            <loader id="apiKeysDl" readOnly="true">
                 <query>
-                    <![CDATA[select e from Position_ e]]>
+                    <![CDATA[select e from ApiKey e]]>
                 </query>
             </loader>
         </collection>
@@ -30,19 +29,19 @@
     </actions>
     <layout>
         <genericFilter id="genericFilter"
-                       dataLoader="positionsDl">
+                       dataLoader="apiKeysDl">
             <properties include=".*"/>
         </genericFilter>
         <hbox id="buttonsPanel" classNames="buttons-panel">
-            <button id="createButton" action="positionsDataGrid.createAction"/>
-            <button id="editButton" action="positionsDataGrid.editAction"/>
-            <button id="removeButton" action="positionsDataGrid.removeAction"/>
-            <simplePagination id="pagination" dataLoader="positionsDl"/>
+            <button id="createButton" action="apiKeysDataGrid.createAction"/>
+            <button id="editButton" action="apiKeysDataGrid.editAction"/>
+            <button id="removeButton" action="apiKeysDataGrid.removeAction"/>
+            <simplePagination id="pagination" dataLoader="apiKeysDl"/>
         </hbox>
-        <dataGrid id="positionsDataGrid"
+        <dataGrid id="apiKeysDataGrid"
                   width="100%"
                   minHeight="20em"
-                  dataContainer="positionsDc"
+                  dataContainer="apiKeysDc"
                   columnReorderingAllowed="true">
             <actions>
                 <action id="createAction" type="list_create"/>
@@ -50,13 +49,11 @@
                 <action id="removeAction" type="list_remove"/>
             </actions>
             <columns resizable="true">
+                <column property="name"/>
                 <column property="account"/>
-                <column property="apiKey"/>
-                <column property="status"/>
-                <column property="createdDate"/>
-                <column property="symbol"/>
-                <column property="positionQty"/>
-                <column property="settlePrice"/>
+                <column property="env"/>
+                <column property="exchangeId"/>
+                <column property="brokerId"/>
             </columns>
         </dataGrid>
         <hbox id="lookupActions" visible="false">

@@ -10,6 +10,7 @@
     <menu id="settings" title="msg://ru.javaboys.wootify/menu.settings.title" opened="true">
         <item view="User.list" title="msg://ru.javaboys.wootify.view.user/UserListView.title"/>
         <item view="Account.list" title="msg://ru.javaboys.wootify.view.account/accountListView.title"/>
+        <item view="ApiKey.list" title="msg://ru.javaboys.wootify.view.apikey/apiKeyListView.title"/>
         <item view="Symbol.list" title="msg://ru.javaboys.wootify.view.symbol/symbolListView.title"/>
     </menu>
 
