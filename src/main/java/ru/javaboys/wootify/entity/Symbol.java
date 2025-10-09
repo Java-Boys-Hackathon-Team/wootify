@@ -19,12 +19,23 @@ public class Symbol {
     @Id
     private UUID id;
 
+    @Column(name = "ANALOG_TICKER")
+    private String analogTicker;
+
     @InstanceName
     @Column(name = "NAME")
     private String name;
 
     @Column(name = "WOOFI_TICKER")
     private String woofiTicker;
+
+    public String getAnalogTicker() {
+        return analogTicker;
+    }
+
+    public void setAnalogTicker(String analogTicker) {
+        this.analogTicker = analogTicker;
+    }
 
     public String getWoofiTicker() {
         return woofiTicker;

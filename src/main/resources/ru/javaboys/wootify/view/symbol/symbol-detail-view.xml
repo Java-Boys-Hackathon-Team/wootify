@@ -24,6 +24,7 @@
             </responsiveSteps>
             <textField id="nameField" property="name"/>
             <textField id="woofiTickerField" property="woofiTicker"/>
+            <textField id="analogTickerField" property="analogTicker"/>
         </formLayout>
         <hbox id="detailActions">
             <button id="saveAndCloseButton" action="saveAction"/>
