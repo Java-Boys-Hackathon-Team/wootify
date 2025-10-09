@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <menu-config xmlns="http://jmix.io/schema/flowui/menu">
 
-    <menu id="application" title="msg://ru.javaboys.wootify/menu.application.title" opened="true">
+    <item view="TraderView" title="msg://ru.javaboys.wootify.view.trader/traderView.title"/>
+
+    <menu id="tradings" title="msg://ru.javaboys.wootify/menu.tradings.title" opened="true">
+        <item view="Position_.list" title="msg://ru.javaboys.wootify.view.position/positionListView.title"/>
+    </menu>
+
+    <menu id="settings" title="msg://ru.javaboys.wootify/menu.settings.title" opened="true">
         <item view="User.list" title="msg://ru.javaboys.wootify.view.user/UserListView.title"/>
         <item view="Account.list" title="msg://ru.javaboys.wootify.view.account/accountListView.title"/>
         <item view="Symbol.list" title="msg://ru.javaboys.wootify.view.symbol/symbolListView.title"/>
-        <item view="Position_.list" title="msg://ru.javaboys.wootify.view.position/positionListView.title"/>
     </menu>
 
 </menu-config>

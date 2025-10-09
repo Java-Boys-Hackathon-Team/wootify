@@ -20,6 +20,9 @@ public class Position {
     @Id
     private UUID id;
 
+    @Column(name = "STATUS")
+    private String status;
+
     @JoinColumn(name = "ACCOUNT_ID")
     @ManyToOne(fetch = FetchType.LAZY)
     private Account account;
@@ -36,6 +39,14 @@ public class Position {
 
     @Column(name = "SETTLE_PRICE", precision = 19, scale = 10)
     private BigDecimal settlePrice;
+
+    public PositionStatus getStatus() {
+        return status == null ? null : PositionStatus.fromId(status);
+    }
+
+    public void setStatus(PositionStatus status) {
+        this.status = status == null ? null : status.getId();
+    }
 
     public Account getAccount() {
         return account;

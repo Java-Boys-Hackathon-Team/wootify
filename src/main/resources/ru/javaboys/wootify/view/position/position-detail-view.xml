@@ -21,6 +21,7 @@
     </actions>
     <layout>
         <formLayout id="form" dataContainer="positionDc">
+            <comboBox id="statusField" dataContainer="positionDc" property="status"/>
             <entityPicker id="symbolsPicker" dataContainer="positionDc" property="symbol">
                 <actions>
                     <action id="entityLookup" type="entity_lookup"/>

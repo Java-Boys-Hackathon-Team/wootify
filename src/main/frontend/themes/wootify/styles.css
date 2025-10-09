@@ -2,3 +2,78 @@
 @import url('view/main-view.css');
 @import url('view/main-view-top-menu.css');
 @import url('view/login-view.css');
+
+.price-box {
+    border: 2px solid var(--lumo-contrast-20pct);
+    border-radius: 8px;
+    padding: var(--lumo-space-m);
+    margin-top: var(--lumo-space-m);
+}
+
+.price-fields {
+    gap: var(--lumo-space-m);
+}
+
+.price-field {
+    border-radius: 6px;
+}
+
+.price-field.bid input {
+    background-color: #e6ffed; /* светло-зелёный */
+}
+
+.price-field.avg input {
+    background-color: #fff9e6; /* светло-жёлтый */
+}
+
+.price-field.ask input {
+    background-color: #ffe6e6; /* светло-красный */
+}
+
+.trade-box {
+    border: 2px solid var(--lumo-contrast-20pct);
+    border-radius: 10px;
+    padding: var(--lumo-space-m);
+    background-color: var(--lumo-base-color);
+    width: 320px;
+    gap: var(--lumo-space-m);
+}
+
+.side-buttons {
+    gap: var(--lumo-space-s);
+}
+
+.side-btn {
+    font-weight: 600;
+    color: white;
+    border-radius: 6px;
+    transition: opacity 0.2s ease;
+}
+
+.side-btn.buy {
+    background-color: #16c784;
+}
+
+.side-btn.sell {
+    background-color: #ea3943;
+}
+
+.side-btn:disabled {
+    opacity: 0.4;
+}
+
+.trade-button {
+    color: white;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: var(--lumo-space-m);
+    margin-top: var(--lumo-space-m);
+}
+
+.trade-button.buy {
+    background-color: #16c784;
+}
+
+.trade-button.sell {
+    background-color: #ea3943;
+}
