@@ -23,14 +23,6 @@
                     <action id="entityLookup" type="entity_lookup"/>
                 </actions>
             </entityPicker>
-            <entityPicker id="symbolEntityPicker"
-                          metaClass="Symbol"
-                          property="name"
-                          label="Ticker">
-                <actions>
-                    <action id="entityLookup" type="entity_lookup"/>
-                </actions>
-            </entityPicker>
             <entityPicker id="apiKeyEntityPicker"
                           metaClass="ApiKey"
                           property="name"
@@ -40,7 +32,21 @@
                 </actions>
             </entityPicker>
             <textField id="myAssets" label="My Assets (USDC)"/>
+            <vbox spacing="false">
+                <label text="  " />
+                <button id="assetsRefreshButton"
+                        text="Refresh Assets"
+                        icon="REFRESH"/>
+            </vbox>
         </hbox>
+        <entityPicker id="symbolEntityPicker"
+                      metaClass="Symbol"
+                      property="name"
+                      label="Ticker">
+            <actions>
+                <action id="entityLookup" type="entity_lookup"/>
+            </actions>
+        </entityPicker>
         <vbox classNames="price-box" spacing="false" padding="false" width="fit-content">
             <h4 text="Prices"/>
             <hbox classNames="price-fields" spacing="true">
