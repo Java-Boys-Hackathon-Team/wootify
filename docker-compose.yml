@@ -15,6 +15,9 @@ services:
       - PG_DATASOURCE_URL=jdbc:postgresql://wootify-db:5432/wootify
       - PG_NAME=pgadmin
       - PG_PASS=pgadmin
+      - APP_API_KEY=woofipro
+      - WOOFI_BRIDGE_BASE_URL=http://woofipro-bridge:8081
+      - WOOFI_BRIDGE_API_KEY=woofipro
     env_file:
       - .env
     extra_hosts:
@@ -52,6 +55,23 @@ services:
       - "5056:80"
     depends_on:
       - wootify-db
+
+  woofipro-bridge:
+    build:
+      context: ./woofipro-bridge
+      dockerfile: Dockerfile
+    image: woofipro-bridge:local
+    container_name: woofipro-bridge
+    restart: always
+    ports:
+      - "8081:8081"
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8081/health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:

@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.event.EventListener;
@@ -22,6 +23,7 @@ import javax.sql.DataSource;
 @Push
 @Theme(value = "wootify")
 @SpringBootApplication
+@EnableFeignClients(basePackages = "ru.javaboys.wootify.client")
 public class WootifyApplication implements AppShellConfigurator {
 
     @Autowired

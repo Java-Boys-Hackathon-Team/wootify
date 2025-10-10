@@ -1,0 +1,118 @@
+### Variables
+@baseUrl = http://localhost:8081
+@apiKey = test
+@symbol = 1000SHIB/USDC:USDC
+
+# Перекрытия ключей/среды для CCXT (заполни своими значениями)
+@wooApiKey = ed25519:4m48K1tvUQ6SBa2WJmUL9d5nbywF192bghRCGC8aV2ry
+@wooApiSecret = 7g8EQ1b7aaSvUizybX3WNsU5fGyTHVr9KbkiAkiFg6uj
+@wooAccountId = 0x8b83287bdb87e1f909387194f4fa34ec49f16727eaa80abf4518b6af0020d1b3
+@wooBrokerId = woofi_pro
+@env = testnet
+
+
+### Health check
+GET {{baseUrl}}/health
+X-API-Key: {{apiKey}}
+
+
+### Who am I (проверить подключение и env)
+GET {{baseUrl}}/whoami?apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&brokerId={{wooBrokerId}}&env={{env}}
+X-API-Key: {{apiKey}}
+
+
+### Get markets (узнать доступные символы)
+GET {{baseUrl}}/markets?apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&brokerId={{wooBrokerId}}&env={{env}}
+X-API-Key: {{apiKey}}
+
+
+### Get ticker
+GET {{baseUrl}}/ticker/{{symbol}}?apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&brokerId={{wooBrokerId}}&env={{env}}
+X-API-Key: {{apiKey}}
+
+
+### Get OHLCV (candles)
+# Примечание: этот эндпоинт должен быть реализован в сервере. Если его нет — будет 404.
+GET {{baseUrl}}/ohlcv?symbol={{symbol}}&timeframe=1m&limit=10&apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&brokerId={{wooBrokerId}}&env={{env}}
+X-API-Key: {{apiKey}}
+
+
+### Create market order
+POST {{baseUrl}}/order?apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&env={{env}}
+X-API-Key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "symbol": "{{symbol}}",
+  "side": "sell",
+  "type": "limit",
+  "price": 0.012,
+  "amount": 1000,
+  "clientOrderId": "bot-{{$timestamp}}"
+}
+
+> {%
+    client.test("Accepted 200", function () {
+        client.assert(response.status === 200, "Expected 200");
+    });
+    const body = typeof response.body === 'string' ? JSON.parse(response.body) : response.body;
+    if (body && (body.id || body.orderId)) {
+        const id = body.id ?? body.orderId;
+        client.global.set("order_id", id);
+        client.log("Stored order_id=" + id);
+    } else {
+        client.log("order_id not found in response: " + JSON.stringify(body));
+    }
+%}
+
+
+### Get order by ID
+GET {{baseUrl}}/order/{{order_id}}?symbol={{symbol}}&apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&brokerId={{wooBrokerId}}&env={{env}}
+X-API-Key: {{apiKey}}
+
+
+### Cancel order
+POST {{baseUrl}}/cancel?symbol={{symbol}}&order_id={{order_id}}&apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&brokerId={{wooBrokerId}}&env={{env}}
+X-API-Key: {{apiKey}}
+
+
+### Get open orders
+GET {{baseUrl}}/orders?status=open&symbol={{symbol}}&limit=20&apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&brokerId={{wooBrokerId}}&env={{env}}
+X-API-Key: {{apiKey}}
+
+
+### Get closed orders
+GET {{baseUrl}}/orders?status=closed&symbol={{symbol}}&limit=20&apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&brokerId={{wooBrokerId}}&env={{env}}
+X-API-Key: {{apiKey}}
+
+
+### Get all orders
+GET {{baseUrl}}/orders?status=all&symbol={{symbol}}&limit=20&apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&brokerId={{wooBrokerId}}&env={{env}}
+X-API-Key: {{apiKey}}
+
+
+### Get positions
+GET {{baseUrl}}/positions?only_open=false&apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&brokerId={{wooBrokerId}}&env={{env}}
+X-API-Key: {{apiKey}}
+
+
+### Stream ticker (Server-Sent Events)
+GET {{baseUrl}}/stream/ticker?symbol={{symbol}}&interval_ms=1000&apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&brokerId={{wooBrokerId}}&env={{env}}
+X-API-Key: {{apiKey}}
+Accept: text/event-stream
+
+
+### Get balance
+GET {{baseUrl}}/balance?apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&brokerId={{wooBrokerId}}&env={{env}}
+X-API-Key: {{apiKey}}
+
+
+### Set leverage
+PUT {{baseUrl}}/positions/{{symbol}}/leverage?apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&brokerId={{wooBrokerId}}&env={{env}}
+X-API-Key: {{apiKey}}
+Content-Type: application/json
+
+{
+  "leverage": 15,
+  "marginMode": "isolated"
+}
