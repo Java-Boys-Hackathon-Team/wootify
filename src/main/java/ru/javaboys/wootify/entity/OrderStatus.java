@@ -7,11 +7,11 @@ import org.springframework.lang.Nullable;
 
 public enum OrderStatus implements EnumClass<String> {
 
+    CREATED("CREATED"),
     NEW("NEW"),
     FILLED("FILLED"),
     PARTIAL_FILLED("PARTIAL_FILLED"),
-    CANCELLED("CANCELLED"),
-    CREATED("CREATED");
+    CANCELLED("CANCELLED");
 
     private final String id;
 

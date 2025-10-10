@@ -5,6 +5,7 @@
 
     <menu id="tradings" title="msg://ru.javaboys.wootify/menu.tradings.title" opened="true">
         <item view="Position_.list" title="msg://ru.javaboys.wootify.view.position/positionListView.title"/>
+        <item view="Order_.list" title="msg://ru.javaboys.wootify.view.order/orderListView.title"/>
     </menu>
 
     <menu id="settings" title="msg://ru.javaboys.wootify/menu.settings.title" opened="true">

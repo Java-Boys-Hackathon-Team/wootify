@@ -39,11 +39,60 @@ public class Position {
     @ManyToOne(fetch = FetchType.LAZY)
     private Symbol symbol;
 
+    @Column(name = "CLOSED_DATE")
+    private LocalDateTime closedDate;
+
+    @Column(name = "LEVERAGE")
+    private Double leverage;
+
     @Column(name = "POSITION_QTY", precision = 19, scale = 10)
     private BigDecimal positionQty;
 
-    @Column(name = "SETTLE_PRICE", precision = 19, scale = 10)
-    private BigDecimal settlePrice;
+    @Column(name = "AVERAGE_OPEN_PRICE", precision = 19, scale = 10)
+    private BigDecimal averageOpenPrice;
+
+    @Column(name = "REALIZED_PNL", precision = 19, scale = 10)
+    private BigDecimal realizedPnl;
+
+    public void setLeverage(Double leverage) {
+        this.leverage = leverage;
+    }
+
+    public Double getLeverage() {
+        return leverage;
+    }
+
+    public BigDecimal getRealizedPnl() {
+        return realizedPnl;
+    }
+
+    public void setRealizedPnl(BigDecimal realizedPnl) {
+        this.realizedPnl = realizedPnl;
+    }
+
+    public BigDecimal getAverageOpenPrice() {
+        return averageOpenPrice;
+    }
+
+    public void setAverageOpenPrice(BigDecimal averageOpenPrice) {
+        this.averageOpenPrice = averageOpenPrice;
+    }
+
+    public BigDecimal getPositionQty() {
+        return positionQty;
+    }
+
+    public void setPositionQty(BigDecimal positionQty) {
+        this.positionQty = positionQty;
+    }
+
+    public LocalDateTime getClosedDate() {
+        return closedDate;
+    }
+
+    public void setClosedDate(LocalDateTime closedDate) {
+        this.closedDate = closedDate;
+    }
 
     public ApiKey getApiKey() {
         return apiKey;
@@ -75,22 +124,6 @@ public class Position {
 
     public void setAccount(Account account) {
         this.account = account;
-    }
-
-    public BigDecimal getSettlePrice() {
-        return settlePrice;
-    }
-
-    public void setSettlePrice(BigDecimal settlePrice) {
-        this.settlePrice = settlePrice;
-    }
-
-    public BigDecimal getPositionQty() {
-        return positionQty;
-    }
-
-    public void setPositionQty(BigDecimal positionQty) {
-        this.positionQty = positionQty;
     }
 
     public Symbol getSymbol() {
