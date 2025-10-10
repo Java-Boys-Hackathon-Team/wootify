@@ -31,6 +31,14 @@
                     <action id="entityLookup" type="entity_lookup"/>
                 </actions>
             </entityPicker>
+            <entityPicker id="apiKeyEntityPicker"
+                          metaClass="ApiKey"
+                          property="name"
+                          label="Api Key">
+                <actions>
+                    <action id="entityLookup" type="entity_lookup"/>
+                </actions>
+            </entityPicker>
             <textField id="myAssets" label="My Assets (USDC)"/>
         </hbox>
         <vbox classNames="price-box" spacing="false" padding="false" width="fit-content">

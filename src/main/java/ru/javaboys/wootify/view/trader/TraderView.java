@@ -19,10 +19,9 @@ import ru.javaboys.wootify.view.main.MainView;
 @ViewController(id = "TraderView")
 @ViewDescriptor(path = "trader-view.xml")
 public class TraderView extends StandardView {
+
     @ViewComponent
     private EntityPicker<Symbol> symbolEntityPicker;
-
-
 
     @ViewComponent
     private JmixButton buyBtn;
