@@ -1,5 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Wootify Jmix Application" type="JmixRunApplication">
+    <option name="envFilePaths">
+      <option value="$PROJECT_DIR$/.env" />
+    </option>
     <option name="MAIN_CLASS_NAME" value="ru.javaboys.wootify.WootifyApplication" />
     <module name="wootify.main" />
     <shortenClasspath name="ARGS_FILE" />
