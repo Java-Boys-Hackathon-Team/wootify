@@ -280,7 +280,7 @@ public class TraderView extends StandardView {
         newPosition.setRealizedPnl(BigDecimal.ZERO);
 
         // Переход на форму редактирования с новым объектом
-        viewNavigators.detailView(Position.class)
+        viewNavigators.detailView(this, Position.class)
                 .newEntity()
                 .withBackwardNavigation(true)
                 .navigate();
@@ -308,7 +308,7 @@ public class TraderView extends StandardView {
         newOrder.setStatus(OrderStatus.CREATED);
 
         // Остальные поля будут заполняться в форме
-        viewNavigators.detailView(Order.class)
+        viewNavigators.detailView(this, Order.class)
                 .newEntity()
                 .withBackwardNavigation(true)
                 .navigate();
