@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import ru.javaboys.wootify.orderly.client.OrderlyStreamingMultiClient;
 
-@SpringBootTest
+//@SpringBootTest
 public class OrderlyStreamingMultiClientTest {
     private static final Logger log = LoggerFactory.getLogger(OrderlyStreamingMultiClientTest.class);
 
