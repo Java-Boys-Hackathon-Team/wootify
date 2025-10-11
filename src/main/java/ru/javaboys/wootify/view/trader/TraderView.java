@@ -15,6 +15,7 @@ import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.router.Route;
 import io.jmix.core.Metadata;
 import io.jmix.flowui.Notifications;
+import io.jmix.flowui.component.combobox.JmixComboBox;
 import io.jmix.flowui.ViewNavigators;
 import io.jmix.flowui.component.grid.DataGrid;
 import io.jmix.flowui.component.valuepicker.EntityPicker;
@@ -38,6 +39,7 @@ import ru.javaboys.wootify.entity.Position;
 import ru.javaboys.wootify.entity.PositionStatus;
 import ru.javaboys.wootify.entity.Symbol;
 import ru.javaboys.wootify.service.AssetsService;
+import ru.javaboys.wootify.service.TradingTerminalService;
 import ru.javaboys.wootify.view.main.MainView;
 
 import java.math.BigDecimal;
@@ -62,14 +64,17 @@ public class TraderView extends StandardView {
     private EntityPicker<Symbol> symbolEntityPicker;
 
     @ViewComponent
+    private JmixComboBox<OrderType> orderTypeCombo;
+
+    @ViewComponent
     private JmixButton buyBtn;
     @ViewComponent
     private JmixButton sellBtn;
     @ViewComponent
     private JmixButton submitBtn;
 
-    @ViewComponent
-    private ComboBox<OrderType> orderTypeCombo;
+//    @ViewComponent
+//    private ComboBox<OrderType> orderTypeCombo;
     @ViewComponent
     private NumberField leverage;
     @ViewComponent
@@ -97,8 +102,9 @@ public class TraderView extends StandardView {
     @Autowired
     AssetsService assetsService;
     @Autowired
+    TradingTerminalService tradingTerminalService;
+    @Autowired
     private Metadata metadata;
-
 
     @Autowired
     private ViewNavigators viewNavigators;
@@ -226,6 +232,24 @@ public class TraderView extends StandardView {
         return result;
     }
 
+    @Subscribe("submitBtn")
+    public void onSubmitButtonClick(ClickEvent<JmixButton> event) {
+
+        tradingTerminalService.submitOrder(
+                accountEntityPicker.getValue(),
+                apiKeyEntityPicker.getValue(),
+                symbolEntityPicker.getValue(),
+                null,
+                orderTypeCombo.getValue(),
+                leverage.getValue(),
+                priceField.getValue(),
+                qtyField.getValue()
+        );
+
+
+
+    }
+
     private void reloadPositions() {
         positionsDl.setParameter("symbol", symbolEntityPicker.getValue());
         positionsDl.setParameter("account", accountEntityPicker.getValue());
@@ -256,7 +280,7 @@ public class TraderView extends StandardView {
         newPosition.setRealizedPnl(BigDecimal.ZERO);
 
         // Переход на форму редактирования с новым объектом
-        viewNavigators.detailView(Position.class)
+        viewNavigators.detailView(this, Position.class)
                 .newEntity()
                 .withBackwardNavigation(true)
                 .navigate();
@@ -284,7 +308,7 @@ public class TraderView extends StandardView {
         newOrder.setStatus(OrderStatus.CREATED);
 
         // Остальные поля будут заполняться в форме
-        viewNavigators.detailView(Order.class)
+        viewNavigators.detailView(this, Order.class)
                 .newEntity()
                 .withBackwardNavigation(true)
                 .navigate();
