@@ -15,7 +15,8 @@ public class AssetsServiceImpl implements AssetsService {
         this.balanceClient = balanceClient;
     }
 
-     public Double getCurrentAssetsInUSDC (Account account, ApiKey apiKey) {
+    @Override
+    public Double getCurrentAssetsInUSDC (Account account, ApiKey apiKey) {
         BalanceResponse response = balanceClient.getBalance(
                 apiKey.getKey(),
                 apiKey.getSecret(),

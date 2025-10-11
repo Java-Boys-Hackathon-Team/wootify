@@ -8,13 +8,17 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import io.jmix.flowui.Notifications;
+import io.jmix.flowui.component.combobox.JmixComboBox;
 import io.jmix.flowui.component.valuepicker.EntityPicker;
 import io.jmix.flowui.kit.component.button.JmixButton;
 import io.jmix.flowui.view.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.javaboys.wootify.entity.*;
 import ru.javaboys.wootify.service.AssetsService;
+import ru.javaboys.wootify.service.TradingTerminalService;
 import ru.javaboys.wootify.view.main.MainView;
+
+import javax.swing.*;
 
 @Route(value = "trader-view", layout = MainView.class)
 @ViewController(id = "TraderView")
@@ -34,14 +38,17 @@ public class TraderView extends StandardView {
     private EntityPicker<Symbol> symbolEntityPicker;
 
     @ViewComponent
+    private JmixComboBox<OrderType> orderTypeCombo;
+
+    @ViewComponent
     private JmixButton buyBtn;
     @ViewComponent
     private JmixButton sellBtn;
     @ViewComponent
     private JmixButton submitBtn;
 
-    @ViewComponent
-    private ComboBox<OrderType> orderTypeCombo;
+//    @ViewComponent
+//    private ComboBox<OrderType> orderTypeCombo;
     @ViewComponent
     private NumberField leverage;
     @ViewComponent
@@ -56,6 +63,8 @@ public class TraderView extends StandardView {
     private Notifications notifications;
     @Autowired
     AssetsService assetsService;
+    @Autowired
+    TradingTerminalService tradingTerminalService;
 
     private OrderSide orderSide = OrderSide.BUY;
 
@@ -134,6 +143,24 @@ public class TraderView extends StandardView {
         }
 
         return result;
+    }
+
+    @Subscribe("submitBtn")
+    public void onSubmitButtonClick(ClickEvent<JmixButton> event) {
+
+        tradingTerminalService.submitOrder(
+                accountEntityPicker.getValue(),
+                apiKeyEntityPicker.getValue(),
+                symbolEntityPicker.getValue(),
+                null,
+                orderTypeCombo.getValue(),
+                leverage.getValue(),
+                priceField.getValue(),
+                qtyField.getValue()
+        );
+
+
+
     }
 
 }
