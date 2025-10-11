@@ -1,10 +1,16 @@
 package ru.javaboys.wootify.view.trader;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Collections;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.ClickEvent;
+import com.vaadin.flow.component.UIDetachedException;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.NumberField;
@@ -13,10 +19,11 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.router.Route;
+
 import io.jmix.core.Metadata;
 import io.jmix.flowui.Notifications;
-import io.jmix.flowui.component.combobox.JmixComboBox;
 import io.jmix.flowui.ViewNavigators;
+import io.jmix.flowui.component.combobox.JmixComboBox;
 import io.jmix.flowui.component.grid.DataGrid;
 import io.jmix.flowui.component.valuepicker.EntityPicker;
 import io.jmix.flowui.kit.component.button.JmixButton;
@@ -28,7 +35,7 @@ import io.jmix.flowui.view.Supply;
 import io.jmix.flowui.view.ViewComponent;
 import io.jmix.flowui.view.ViewController;
 import io.jmix.flowui.view.ViewDescriptor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import ru.javaboys.wootify.entity.Account;
 import ru.javaboys.wootify.entity.ApiKey;
 import ru.javaboys.wootify.entity.Order;
@@ -38,77 +45,53 @@ import ru.javaboys.wootify.entity.OrderType;
 import ru.javaboys.wootify.entity.Position;
 import ru.javaboys.wootify.entity.PositionStatus;
 import ru.javaboys.wootify.entity.Symbol;
+import ru.javaboys.wootify.orderly.client.OrderlyStreamingClient;
 import ru.javaboys.wootify.service.AssetsService;
 import ru.javaboys.wootify.service.TradingTerminalService;
 import ru.javaboys.wootify.view.main.MainView;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Collections;
-
+@Slf4j
 @Route(value = "trader-view", layout = MainView.class)
 @ViewController(id = "TraderView")
 @ViewDescriptor(path = "trader-view.xml")
 public class TraderView extends StandardView {
 
-    @ViewComponent
-    private EntityPicker<Account> accountEntityPicker;
-    @ViewComponent
-    private EntityPicker<ApiKey> apiKeyEntityPicker;
-    @ViewComponent
-    private TextField myAssets;
-    @ViewComponent
-    private JmixButton assetsRefreshButton;
+    @ViewComponent private EntityPicker<Account> accountEntityPicker;
+    @ViewComponent private EntityPicker<ApiKey> apiKeyEntityPicker;
+    @ViewComponent private EntityPicker<Symbol> symbolEntityPicker;
 
-    @ViewComponent
-    private EntityPicker<Symbol> symbolEntityPicker;
+    @ViewComponent private JmixComboBox<OrderType> orderTypeCombo;
+    @ViewComponent private JmixButton assetsRefreshButton;
+    @ViewComponent private TextField myAssets;
 
-    @ViewComponent
-    private JmixComboBox<OrderType> orderTypeCombo;
+    @ViewComponent private JmixButton buyBtn;
+    @ViewComponent private JmixButton sellBtn;
+    @ViewComponent private JmixButton submitBtn;
+    @ViewComponent private JmixButton createPositionBtn;
+    @ViewComponent private JmixButton createOrderBtn;
 
-    @ViewComponent
-    private JmixButton buyBtn;
-    @ViewComponent
-    private JmixButton sellBtn;
-    @ViewComponent
-    private JmixButton submitBtn;
+    @ViewComponent private NumberField leverage;
+    @ViewComponent private BigDecimalField priceField;
+    @ViewComponent private BigDecimalField qtyField;
+    @ViewComponent private BigDecimalField totalField;
+    @ViewComponent private BigDecimalField bidPrice;
+    @ViewComponent private BigDecimalField avgPrice;
+    @ViewComponent private BigDecimalField askPrice;
 
-//    @ViewComponent
-//    private ComboBox<OrderType> orderTypeCombo;
-    @ViewComponent
-    private NumberField leverage;
-    @ViewComponent
-    private BigDecimalField priceField;
-    @ViewComponent
-    private BigDecimalField qtyField;
-    @ViewComponent
-    private BigDecimalField totalField;
-    @ViewComponent
-    private CollectionContainer<Order> ordersDc;
-    @ViewComponent
-    private CollectionLoader<Order> ordersDl;
-    @ViewComponent
-    private CollectionContainer<Position> positionsDc;
-    @ViewComponent
-    private CollectionLoader<Position> positionsDl;
+    @ViewComponent private CollectionLoader<Order> ordersDl;
+    @ViewComponent private CollectionContainer<Order> ordersDc;
 
-    @ViewComponent
-    private JmixButton createPositionBtn;
-    @ViewComponent
-    private JmixButton createOrderBtn;
+    @ViewComponent private CollectionLoader<Position> positionsDl;
+    @ViewComponent private CollectionContainer<Position> positionsDc;
 
-    @Autowired
-    private Notifications notifications;
-    @Autowired
-    AssetsService assetsService;
-    @Autowired
-    TradingTerminalService tradingTerminalService;
-    @Autowired
-    private Metadata metadata;
+    @Autowired private TradingTerminalService tradingTerminalService;
+    @Autowired private Notifications notifications;
+    @Autowired private AssetsService assetsService;
+    @Autowired private ViewNavigators viewNavigators;
+    @Autowired private Metadata metadata;
+    @Value("${orderly.account-id}") private String accountId;
 
-    @Autowired
-    private ViewNavigators viewNavigators;
-
+    private OrderlyStreamingClient streamingClient;
     private OrderSide orderSide = OrderSide.BUY;
 
     @Subscribe
@@ -334,6 +317,43 @@ public class TraderView extends StandardView {
             layout.add(cancelBtn, infoBtn);
             return layout;
         });
+    }
+
+    @Subscribe("symbolEntityPicker")
+    private void onSymbolEntityPickerChange(AbstractField.ComponentValueChangeEvent<EntityPicker<Symbol>, Symbol> event) {
+        Symbol oldSymbol = event.getOldValue();
+        Symbol symbol = event.getValue();
+        if (oldSymbol != null && oldSymbol.equals(symbol)) {
+            log.info("New symbol is the same, skip change price streaming, old: {}, new: {}",
+                    oldSymbol.getWoofiTicker(), symbol.getWoofiTicker());
+            return;
+        }
+
+        unsubscribeIfNeed();
+
+        if (symbol != null) {
+            streamingClient = new OrderlyStreamingClient(accountId, symbol.getWoofiTicker(), data -> {
+                try {
+                    getUI().get().access(() -> {
+                        bidPrice.setValue(data.getData().getBid());
+                        avgPrice.setValue(BigDecimal.ZERO);
+                        askPrice.setValue(data.getData().getAsk());
+                    });
+                } catch (UIDetachedException e) {
+                    log.warn("UIDetachedException while updating bid/avg/ask prices");
+                    unsubscribeIfNeed();
+                }
+            });
+        }
+    }
+
+    private void unsubscribeIfNeed() {
+        if (streamingClient != null) {
+            streamingClient.unsubscribeAndWait();
+            bidPrice.clear();
+            avgPrice.clear();
+            askPrice.clear();
+        }
     }
 
     private void onCancelPosition(Position position) {
