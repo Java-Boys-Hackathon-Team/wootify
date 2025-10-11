@@ -2,11 +2,17 @@ package ru.javaboys.wootify.entity;
 
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.metamodel.annotation.JmixEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
 
 @JmixEntity
@@ -23,9 +29,8 @@ public class Order {
     @Id
     private UUID id;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "CREATED_DATE")
-    private Date createdDate;
+    private LocalDateTime createdDate;
 
     @Column(name = "SENDING_DATE")
     private LocalDateTime sendingDate;
@@ -78,6 +83,14 @@ public class Order {
 
     @Column(name = "REALIZED_PNL", precision = 19, scale = 10)
     private BigDecimal realizedPnl;
+
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
+    }
 
     public BigDecimal getRealizedPnl() {
         return realizedPnl;
@@ -205,14 +218,6 @@ public class Order {
 
     public void setSendingDate(LocalDateTime sendingDate) {
         this.sendingDate = sendingDate;
-    }
-
-    public Date getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Date createdDate) {
-        this.createdDate = createdDate;
     }
 
     public UUID getId() {

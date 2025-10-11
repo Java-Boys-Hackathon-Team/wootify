@@ -27,43 +27,11 @@
                 <responsiveStep minWidth="0" columns="1"/>
                 <responsiveStep minWidth="40em" columns="2"/>
             </responsiveSteps>
-            <dateTimePicker id="createdDateField" property="createdDate"/>
-            <dateTimePicker id="sendingDateField" property="sendingDate"/>
-            <dateTimePicker id="closedDateField" property="closedDate"/>
-            <entityPicker id="accountField" property="account">
-                <actions>
-                    <action id="entityLookupAction" type="entity_lookup"/>
-                    <action id="entityClearAction" type="entity_clear"/>
-                </actions>
-            </entityPicker>
-            <entityPicker id="apiKeyField" property="apiKey">
-                <actions>
-                    <action id="entityLookupAction" type="entity_lookup"/>
-                    <action id="entityClearAction" type="entity_clear"/>
-                </actions>
-            </entityPicker>
-            <entityPicker id="positionField" property="position">
-                <actions>
-                    <action id="entityLookupAction" type="entity_lookup"/>
-                    <action id="entityClearAction" type="entity_clear"/>
-                </actions>
-            </entityPicker>
-            <entityPicker id="symbolField" property="symbol">
-                <actions>
-                    <action id="entityLookupAction" type="entity_lookup"/>
-                    <action id="entityClearAction" type="entity_clear"/>
-                </actions>
-            </entityPicker>
+
             <select id="typeField" property="type"/>
             <select id="sideField" property="side"/>
-            <select id="statusField" property="status"/>
             <textField id="quantityField" property="quantity"/>
             <textField id="priceField" property="price"/>
-            <textField id="orderlyOrderIdField" property="orderlyOrderId"/>
-            <textField id="totalFeeField" property="totalFee"/>
-            <textField id="averageExecutedPriceField" property="averageExecutedPrice"/>
-            <textField id="totalExecutedQuantityField" property="totalExecutedQuantity"/>
-            <textField id="realizedPnlField" property="realizedPnl"/>
         </formLayout>
         <hbox id="detailActions">
             <button id="saveAndCloseButton" action="saveAction"/>
