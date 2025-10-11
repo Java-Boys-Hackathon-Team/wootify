@@ -49,13 +49,19 @@ public class OrderlyStreamingClient extends AbstractOrderlyClient {
         this.workingThread.start();
     }
 
-    public void unsubscribe() {
+    public void unsubscribeAndWait() {
         String topicName = buildTopic(symbol);
         JsonObject obj = buildUnsubscribeJson(topicName);
         log.info("Unsubscribe {}", obj);
 
         webSocket.send(obj.toString());
         workingThread.interrupt();
+        webSocket.close(1000, "Unsubscribe");
+        try {
+            workingThread.join();
+        } catch (InterruptedException e) {
+            log.warn("Error while waiting for working thread to finish", e);
+        }
     }
 
     private void subscribe(String symbol) {

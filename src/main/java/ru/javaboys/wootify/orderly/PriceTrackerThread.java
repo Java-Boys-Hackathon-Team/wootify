@@ -54,6 +54,10 @@ public class PriceTrackerThread extends Thread {
                 }
 
                 listener.priceDataReceived(data);
+            } catch (InterruptedException iex) {
+                log.error("InterruptedException", iex);
+                Thread.currentThread().interrupt();
+                break;
             } catch (Exception e) {
                 log.error("Unknown error", e);
             }
