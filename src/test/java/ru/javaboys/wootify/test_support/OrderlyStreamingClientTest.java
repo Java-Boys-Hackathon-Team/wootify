@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import ru.javaboys.wootify.orderly.client.OrderlyStreamingClient;
 
-@SpringBootTest
+//@SpringBootTest
 public class OrderlyStreamingClientTest {
     private static final Logger log = LoggerFactory.getLogger(OrderlyStreamingClientTest.class);
 
@@ -30,11 +30,11 @@ public class OrderlyStreamingClientTest {
         sleep(30_000L);
 
         log.info("Unsubscribe from client#1 30s");
-        client1.unsubscribe();
+        client1.unsubscribeAndWait();
         sleep(30_000L);
 
         log.info("Unsubscribe from client#2 30s");
-        client2.unsubscribe();
+        client2.unsubscribeAndWait();
         sleep(30_000L);
     }
 
