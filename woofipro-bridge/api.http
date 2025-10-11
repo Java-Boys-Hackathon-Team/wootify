@@ -1,7 +1,7 @@
 ### Variables
 @baseUrl = http://localhost:8081
 @apiKey = test
-@symbol = 1000SHIB/USDC:USDC
+@symbol = LINK/USDC:USDC
 
 # Перекрытия ключей/среды для CCXT (заполни своими значениями)
 @wooApiKey = ed25519:4m48K1tvUQ6SBa2WJmUL9d5nbywF192bghRCGC8aV2ry
@@ -9,6 +9,8 @@
 @wooAccountId = 0x8b83287bdb87e1f909387194f4fa34ec49f16727eaa80abf4518b6af0020d1b3
 @wooBrokerId = woofi_pro
 @env = testnet
+
+@order_id = 2776116278
 
 
 ### Health check
@@ -45,9 +47,9 @@ Content-Type: application/json
 {
   "symbol": "{{symbol}}",
   "side": "sell",
-  "type": "limit",
-  "price": 0.012,
-  "amount": 1000,
+  "type": "market",
+
+  "amount": 10,
   "clientOrderId": "bot-{{$timestamp}}"
 }
 
