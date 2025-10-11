@@ -1,20 +1,48 @@
 package ru.javaboys.wootify.view.trader;
 
 
+import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.ClickEvent;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.Renderer;
+import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.router.Route;
+import io.jmix.core.Metadata;
 import io.jmix.flowui.Notifications;
+import io.jmix.flowui.ViewNavigators;
+import io.jmix.flowui.component.grid.DataGrid;
 import io.jmix.flowui.component.valuepicker.EntityPicker;
 import io.jmix.flowui.kit.component.button.JmixButton;
-import io.jmix.flowui.view.*;
+import io.jmix.flowui.model.CollectionContainer;
+import io.jmix.flowui.model.CollectionLoader;
+import io.jmix.flowui.view.StandardView;
+import io.jmix.flowui.view.Subscribe;
+import io.jmix.flowui.view.Supply;
+import io.jmix.flowui.view.ViewComponent;
+import io.jmix.flowui.view.ViewController;
+import io.jmix.flowui.view.ViewDescriptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.javaboys.wootify.entity.*;
+import ru.javaboys.wootify.entity.Account;
+import ru.javaboys.wootify.entity.ApiKey;
+import ru.javaboys.wootify.entity.Order;
+import ru.javaboys.wootify.entity.OrderSide;
+import ru.javaboys.wootify.entity.OrderStatus;
+import ru.javaboys.wootify.entity.OrderType;
+import ru.javaboys.wootify.entity.Position;
+import ru.javaboys.wootify.entity.PositionStatus;
+import ru.javaboys.wootify.entity.Symbol;
 import ru.javaboys.wootify.service.AssetsService;
 import ru.javaboys.wootify.view.main.MainView;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Collections;
 
 @Route(value = "trader-view", layout = MainView.class)
 @ViewController(id = "TraderView")
@@ -50,14 +78,47 @@ public class TraderView extends StandardView {
     private BigDecimalField qtyField;
     @ViewComponent
     private BigDecimalField totalField;
+    @ViewComponent
+    private CollectionContainer<Order> ordersDc;
+    @ViewComponent
+    private CollectionLoader<Order> ordersDl;
+    @ViewComponent
+    private CollectionContainer<Position> positionsDc;
+    @ViewComponent
+    private CollectionLoader<Position> positionsDl;
 
+    @ViewComponent
+    private JmixButton createPositionBtn;
+    @ViewComponent
+    private JmixButton createOrderBtn;
 
     @Autowired
     private Notifications notifications;
     @Autowired
     AssetsService assetsService;
+    @Autowired
+    private Metadata metadata;
+
+
+    @Autowired
+    private ViewNavigators viewNavigators;
 
     private OrderSide orderSide = OrderSide.BUY;
+
+    @Subscribe
+    public void onBeforeShow(final BeforeShowEvent event) {
+        ApiKey apiKey = apiKeyEntityPicker.getValue();
+        Account account = accountEntityPicker.getValue();
+        Symbol symbol = symbolEntityPicker.getValue();
+
+        positionsDl.setParameter("apiKey", apiKey);
+        positionsDl.setParameter("account", account);
+        positionsDl.setParameter("symbol", symbol);
+        ordersDl.setParameter("position", null);
+
+        positionsDl.load();
+        ordersDl.load();
+    }
 
     @Subscribe
     public void onInit(InitEvent event) {
@@ -75,6 +136,35 @@ public class TraderView extends StandardView {
         });
 
         orderTypeCombo.addValueChangeListener(e -> updatePriceEditable());
+
+        createPositionBtn.addClickListener(this::onCreatePositionClick);
+        createOrderBtn.addClickListener(this::onCreateOrderClick);
+    }
+
+    @Subscribe("positionsTable")
+    public void onPositionsTableSelection(final SelectionEvent<DataGrid<Position>, Position> event) {
+        Position selected = event.getFirstSelectedItem().orElse(null);
+        if (selected != null) {
+            ordersDl.setParameter("position", selected);
+            ordersDl.load();
+        } else {
+            ordersDc.setItems(Collections.emptyList());
+        }
+    }
+
+    @Subscribe("apiKeyEntityPicker")
+    public void onApiKeyEntityPickerValueChange(AbstractField.ComponentValueChangeEvent<EntityPicker<ApiKey>, ApiKey> event) {
+        reloadPositions();
+    }
+
+    @Subscribe("accountEntityPicker")
+    public void onAccountEntityPickerValueChange(AbstractField.ComponentValueChangeEvent<EntityPicker<Account>, Account> event) {
+        reloadPositions();
+    }
+
+    @Subscribe("symbolEntityPicker")
+    public void onSymbolEntityPickerValueChange(AbstractField.ComponentValueChangeEvent<EntityPicker<Symbol>, Symbol> event) {
+        reloadPositions();
     }
 
     private void updatePriceEditable() {
@@ -136,4 +226,115 @@ public class TraderView extends StandardView {
         return result;
     }
 
+    private void reloadPositions() {
+        positionsDl.setParameter("symbol", symbolEntityPicker.getValue());
+        positionsDl.setParameter("account", accountEntityPicker.getValue());
+        positionsDl.setParameter("apiKey", apiKeyEntityPicker.getValue());
+        positionsDl.load();
+    }
+
+    private void onCreatePositionClick(ClickEvent<Button> event) {
+        Position newPosition = metadata.create(Position.class);
+
+        newPosition.setApiKey(apiKeyEntityPicker.getValue());
+        newPosition.setAccount(accountEntityPicker.getValue());
+        newPosition.setSymbol(symbolEntityPicker.getValue());
+
+        newPosition.setStatus(PositionStatus.CREATED);
+        newPosition.setCreatedDate(LocalDateTime.now());
+
+        if (leverage.getValue() != null) {
+            newPosition.setLeverage(leverage.getValue());
+        }
+        if (qtyField.getValue() != null) {
+            newPosition.setPositionQty(qtyField.getValue());
+        }
+        if (priceField.getValue() != null) {
+            newPosition.setAverageOpenPrice(priceField.getValue());
+        }
+
+        newPosition.setRealizedPnl(BigDecimal.ZERO);
+
+        // Переход на форму редактирования с новым объектом
+        viewNavigators.detailView(Position.class)
+                .newEntity()
+                .withBackwardNavigation(true)
+                .navigate();
+    }
+
+    private void onCreateOrderClick(ClickEvent<Button> event) {
+        Position selectedPosition = positionsDc.getItem();
+        if (selectedPosition == null) {
+            notifications.create("Выберите позицию для создания ордера")
+                    .withType(Notifications.Type.WARNING)
+                    .show();
+            return;
+        }
+
+        Order newOrder = metadata.create(Order.class);
+
+        newOrder.setPosition(selectedPosition);
+        newOrder.setAccount(selectedPosition.getAccount());
+        newOrder.setApiKey(selectedPosition.getApiKey());
+        newOrder.setSymbol(selectedPosition.getSymbol());
+        newOrder.setCreatedDate(LocalDateTime.now());
+
+        newOrder.setSide(orderSide);
+        newOrder.setType(orderTypeCombo.getValue());
+        newOrder.setStatus(OrderStatus.CREATED);
+
+        // Остальные поля будут заполняться в форме
+        viewNavigators.detailView(Order.class)
+                .newEntity()
+                .withBackwardNavigation(true)
+                .navigate();
+    }
+
+    @Supply(to = "positionsTable.actions", subject = "renderer")
+    protected Renderer<Position> positionActionsRenderer() {
+        return new ComponentRenderer<>(position -> {
+            HorizontalLayout layout = new HorizontalLayout();
+            Button cancelBtn = new Button("Cancel", e -> onCancelPosition(position));
+            Button infoBtn = new Button("Info", e -> onInfoPosition(position));
+            layout.add(cancelBtn, infoBtn);
+            return layout;
+        });
+    }
+
+    @Supply(to = "ordersTable.actions", subject = "renderer")
+    protected Renderer<Order> ordersTableActionsRenderer() {
+        return new ComponentRenderer<>(order -> {
+            HorizontalLayout layout = new HorizontalLayout();
+            Button cancelBtn = new Button("Cancel", e -> onCancelOrder(order));
+            Button infoBtn = new Button("Info", e -> onInfoOrder(order));
+            layout.add(cancelBtn, infoBtn);
+            return layout;
+        });
+    }
+
+    private void onCancelPosition(Position position) {
+        // todo: логика отмены позиции
+        notifications.create("Отмена позиции: " + getSymbolSafe(position)).show();
+    }
+
+    private void onInfoPosition(Position position) {
+        notifications.create("Инфо по позиции: " + getSymbolSafe(position)).show();
+    }
+
+    private void onCancelOrder(Order order) {
+        // todo: логика отмены ордера
+        notifications.create("Отмена ордера: " + getSymbolSafe(order)).show();
+    }
+
+    private void onInfoOrder(Order order) {
+        notifications.create("Инфо по ордеру: " + getSymbolSafe(order)).show();
+    }
+
+    private String getSymbolSafe(Position position) {
+        return position.getSymbol() != null ? position.getSymbol().getName() : "(нет символа)";
+    }
+
+    private String getSymbolSafe(Order order) {
+        return order.getSymbol() != null ? order.getSymbol().getName() : "(нет символа)";
+    }
 }

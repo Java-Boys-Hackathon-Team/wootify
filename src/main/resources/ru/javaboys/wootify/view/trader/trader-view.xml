@@ -1,91 +1,169 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <view xmlns="http://jmix.io/schema/flowui/view"
       title="msg://traderView.title">
-<!--    <data>-->
-<!--        <collection id="symbolsDc"-->
-<!--                    class="ru.javaboys.wootify.entity.Symbol">-->
-<!--            <fetchPlan extends="_base"/>-->
-<!--            <loader id="symbolsDl" readOnly="true">-->
-<!--                <query>-->
-<!--                    <![CDATA[select e from Symbol e]]>-->
-<!--                </query>-->
-<!--            </loader>-->
-<!--        </collection>-->
-<!--        <instance id="symbolDc" class="ru.javaboys.wootify.entity.Symbol"/>-->
-<!--    </data>-->
+
+    <data>
+        <!-- Таблица ордеров -->
+        <collection id="ordersDc" class="ru.javaboys.wootify.entity.Order">
+            <fetchPlan extends="_base"/>
+            <loader id="ordersDl">
+                <query>
+                    <![CDATA[
+                        select o from Order_ o
+                        where (:position is null or o.position = :position)
+                        order by o.createdDate desc
+                    ]]>
+                </query>
+            </loader>
+        </collection>
+
+        <!-- Таблица позиций -->
+        <collection id="positionsDc" class="ru.javaboys.wootify.entity.Position">
+            <fetchPlan extends="_base"/>
+            <loader id="positionsDl">
+                <query>
+                    <![CDATA[
+                        select p from Position_ p
+                        where (:symbol is null or p.symbol = :symbol)
+                            and (:account is null or p.account = :account)
+                            and (:apiKey is null or p.apiKey = :apiKey)
+                        order by p.createdDate desc
+                    ]]>
+                </query>
+            </loader>
+        </collection>
+    </data>
+
     <layout>
-        <hbox>
-            <entityPicker id="accountEntityPicker"
-                          metaClass="Account"
-                          property="name"
-                          label="Account">
-                <actions>
-                    <action id="entityLookup" type="entity_lookup"/>
-                </actions>
-            </entityPicker>
-            <entityPicker id="apiKeyEntityPicker"
-                          metaClass="ApiKey"
-                          property="name"
-                          label="Api Key">
-                <actions>
-                    <action id="entityLookup" type="entity_lookup"/>
-                </actions>
-            </entityPicker>
-            <textField id="myAssets" label="My Assets (USDC)"/>
-            <vbox spacing="false">
-                <label text="  " />
-                <button id="assetsRefreshButton"
-                        text="Refresh Assets"
-                        icon="REFRESH"/>
+        <hbox width="100%" spacing="true">
+
+            <!-- Левая часть: торговая панель -->
+            <vbox width="70%" spacing="true">
+                <hbox>
+                    <entityPicker id="accountEntityPicker"
+                                  metaClass="Account"
+                                  property="name"
+                                  label="Account">
+                        <actions>
+                            <action id="entityLookup" type="entity_lookup"/>
+                        </actions>
+                    </entityPicker>
+
+                    <entityPicker id="apiKeyEntityPicker"
+                                  metaClass="ApiKey"
+                                  property="name"
+                                  label="Api Key">
+                        <actions>
+                            <action id="entityLookup" type="entity_lookup"/>
+                        </actions>
+                    </entityPicker>
+
+                    <textField id="myAssets" label="My Assets (USDC)"/>
+
+                    <vbox spacing="false">
+                        <label text="  "/>
+                        <button id="assetsRefreshButton"
+                                text="Refresh Assets"
+                                icon="REFRESH"/>
+                    </vbox>
+                </hbox>
+
+                <entityPicker id="symbolEntityPicker"
+                              metaClass="Symbol"
+                              property="name"
+                              label="Ticker">
+                    <actions>
+                        <action id="entityLookup" type="entity_lookup"/>
+                    </actions>
+                </entityPicker>
+
+                <vbox classNames="price-box" spacing="false" padding="false" width="fit-content">
+                    <h4 text="Prices"/>
+                    <hbox classNames="price-fields" spacing="true">
+                        <textField id="bidPrice" label="Bid" classNames="price-field bid"/>
+                        <textField id="avgPrice" label="Avg" classNames="price-field avg"/>
+                        <textField id="askPrice" label="Ask" classNames="price-field ask"/>
+                    </hbox>
+                </vbox>
+
+                <vbox classNames="trade-box" spacing="true" width="fit-content">
+                    <hbox classNames="side-buttons">
+                        <button id="buyBtn" text="Buy" classNames="side-btn buy" width="50%"/>
+                        <button id="sellBtn" text="Sell" classNames="side-btn sell" width="50%"/>
+                    </hbox>
+
+                    <hbox>
+                        <comboBox id="orderTypeCombo"
+                                  label="Order Type"
+                                  itemsEnum="ru.javaboys.wootify.enums.OrderType"/>
+
+                        <numberField id="leverage"
+                                     label="Leverage (x)"
+                                     min="1" max="100"
+                                     step="1"
+                                     value="10"
+                                     stepButtonsVisible="true"/>
+                    </hbox>
+
+                    <hbox classNames="order-fields">
+                        <bigDecimalField id="priceField" label="Price" placeholder="0.00"/>
+                        <bigDecimalField id="qtyField" label="Qty" placeholder="0.00"/>
+                        <bigDecimalField id="totalField" label="Total" placeholder="0.00"/>
+                    </hbox>
+
+                    <button id="submitBtn"
+                            text="Buy / Long"
+                            classNames="trade-button buy"
+                            width="100%"/>
+                </vbox>
+            </vbox>
+
+            <!-- Правая часть: таблицы -->
+            <vbox width="30%" spacing="true">
+
+                <hbox spacing="true">
+                    <button id="createPositionBtn"
+                            text="Создать позицию"
+                            icon="PLUS"
+                            classNames="action-button"/>
+                    <button id="createOrderBtn"
+                            text="Создать ордер"
+                            icon="PLUS"
+                            classNames="action-button"/>
+                </hbox>
+
+                <h4 text="Positions"/>
+                <dataGrid id="positionsTable"
+                          dataContainer="positionsDc"
+                          height="200px"
+                          classNames="table">
+                    <columns>
+                        <column property="symbol.name"/>
+                        <column property="positionQty"/>
+                        <column property="averageOpenPrice"/>
+                        <column property="realizedPnl"/>
+                        <column property="status"/>
+                        <column key="actions"/>
+                    </columns>
+                </dataGrid>
+
+                <h4 text="Orders"/>
+                <dataGrid id="ordersTable"
+                          dataContainer="ordersDc"
+                          height="200px"
+                          classNames="table">
+                    <columns>
+                        <column property="symbol.name"/>
+                        <column property="price"/>
+                        <column property="quantity"/>
+                        <column property="averageExecutedPrice"/>
+                        <column property="totalExecutedQuantity"/>
+                        <column property="status"/>
+                        <column key="actions"/>
+                    </columns>
+                </dataGrid>
+
             </vbox>
         </hbox>
-        <entityPicker id="symbolEntityPicker"
-                      metaClass="Symbol"
-                      property="name"
-                      label="Ticker">
-            <actions>
-                <action id="entityLookup" type="entity_lookup"/>
-            </actions>
-        </entityPicker>
-        <vbox classNames="price-box" spacing="false" padding="false" width="fit-content">
-            <h4 text="Prices"/>
-            <hbox classNames="price-fields" spacing="true">
-                <textField id="bidPrice" label="Bid" classNames="price-field bid"/>
-                <textField id="avgPrice" label="Avg" classNames="price-field avg"/>
-                <textField id="askPrice" label="Ask" classNames="price-field ask"/>
-            </hbox>
-        </vbox>
-        <vbox classNames="trade-box" spacing="true" width="fit-content">
-
-            <hbox classNames="side-buttons">
-                <button id="buyBtn" text="Buy" classNames="side-btn buy" width="50%"/>
-                <button id="sellBtn" text="Sell" classNames="side-btn sell" width="50%"/>
-            </hbox>
-
-            <hbox>
-                <comboBox id="orderTypeCombo"
-                          label="Order Type"
-                          itemsEnum="ru.javaboys.wootify.enums.OrderType"/>
-
-                <numberField id="leverage"
-                             label="Leverage (x)"
-                             min="1" max="100"
-                             step="1"
-                             value="10"
-                             stepButtonsVisible="true"/>
-            </hbox>
-
-            <hbox classNames="order-fields">
-                <bigDecimalField id="priceField" label="Price" placeholder="0.00"/>
-                <bigDecimalField id="qtyField" label="Qty" placeholder="0.00"/>
-                <bigDecimalField id="totalField" label="Total" placeholder="0.00"/>
-            </hbox>
-
-            <button id="submitBtn"
-                    text="Buy / Long"
-                    classNames="trade-button buy"
-                    width="100%"/>
-
-        </vbox>
     </layout>
 </view>
