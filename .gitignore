@@ -268,3 +268,4 @@ webpack.generated.js
 
 .idea/
 .env
+/woofipro-bridge/.venv/
