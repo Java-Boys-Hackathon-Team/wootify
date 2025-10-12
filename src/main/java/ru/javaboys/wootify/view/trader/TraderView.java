@@ -47,6 +47,7 @@ import ru.javaboys.wootify.entity.PositionStatus;
 import ru.javaboys.wootify.entity.Symbol;
 import ru.javaboys.wootify.orderly.client.OrderlyStreamingClient;
 import ru.javaboys.wootify.service.AssetsService;
+import ru.javaboys.wootify.service.PositionSevice;
 import ru.javaboys.wootify.service.TradingTerminalService;
 import ru.javaboys.wootify.view.main.MainView;
 
@@ -87,6 +88,7 @@ public class TraderView extends StandardView {
     @Autowired private TradingTerminalService tradingTerminalService;
     @Autowired private Notifications notifications;
     @Autowired private AssetsService assetsService;
+    @Autowired private PositionSevice positionSevice;
     @Autowired private ViewNavigators viewNavigators;
     @Autowired private Metadata metadata;
     @Value("${orderly.account-id}") private String accountId;
@@ -112,19 +114,7 @@ public class TraderView extends StandardView {
     @Subscribe
     public void onInit(InitEvent event) {
         orderTypeCombo.setItems(OrderType.values());
-        orderTypeCombo.setValue(OrderType.LIMIT);
-
-        buyBtn.addClickListener(e -> {
-            orderSide = OrderSide.BUY;
-            updateUI();
-        });
-
-        sellBtn.addClickListener(e -> {
-            orderSide = OrderSide.SELL;
-            updateUI();
-        });
-
-        orderTypeCombo.addValueChangeListener(e -> updatePriceEditable());
+        orderTypeCombo.setValue(OrderType.MARKET);
 
         createPositionBtn.addClickListener(this::onCreatePositionClick);
         createOrderBtn.addClickListener(this::onCreateOrderClick);
@@ -161,26 +151,6 @@ public class TraderView extends StandardView {
         priceField.setReadOnly(!isLimit);
     }
 
-    private void updateUI() {
-        boolean isBuy = orderSide == OrderSide.BUY;
-
-        // визуально показываем активную сторону
-        buyBtn.setEnabled(!isBuy);
-        sellBtn.setEnabled(isBuy);
-
-        if (isBuy) {
-            submitBtn.setText("Buy / Long");
-            submitBtn.removeClassNames("sell");
-            submitBtn.addClassNames("buy");
-        } else {
-            submitBtn.setText("Sell / Short");
-            submitBtn.removeClassNames("buy");
-            submitBtn.addClassNames("sell");
-        }
-
-        updatePriceEditable();
-    }
-
     @Subscribe("assetsRefreshButton")
     public void onAssetsRefreshButtonClick(ClickEvent<JmixButton> event) {
         if (!checkAccountAndApiKeyFieldsFilling()) {
@@ -215,21 +185,58 @@ public class TraderView extends StandardView {
         return result;
     }
 
-    @Subscribe("submitBtn")
-    public void onSubmitButtonClick(ClickEvent<JmixButton> event) {
+    @Subscribe("checkLeverageButton")
+    public void onCheckLeverageButton(ClickEvent<JmixButton> event) {
+        //Добавить проверку Leverage для Тикера
+        notifications.create("Not supported yet")
+                .withType(Notifications.Type.SUCCESS)
+                .show();
+    }
+
+    @Subscribe("setLeverageButton")
+    public void onSetLeverageButton(ClickEvent<JmixButton> event) {
+        Double leverageBefore = leverage.getValue();
+        Double leverageValue = positionSevice.setLeverageForTicker(
+                accountEntityPicker.getValue(),
+                apiKeyEntityPicker.getValue(),
+                leverageBefore,
+                symbolEntityPicker.getValue()
+        );
+        leverage.setValue(leverageValue);
+
+        if (leverageValue.equals(leverageBefore)) {
+            notifications.create("Leverage set successfully")
+                    .withType(Notifications.Type.SUCCESS)
+                    .show();
+        } else {
+            notifications.create("Leverage set not successfully")
+                    .withType(Notifications.Type.WARNING)
+                    .show();
+        }
+    }
+
+    @Subscribe("buyButton")
+    public void onBuyButtonClick(ClickEvent<JmixButton> event) {
+        onTradeButtonClick(OrderSide.BUY);
+    }
+
+    @Subscribe("sellButton")
+    public void onSellButtonClick(ClickEvent<JmixButton> event) {
+        onTradeButtonClick(OrderSide.SELL);
+    }
+
+    public void onTradeButtonClick(OrderSide orderSide) {
 
         tradingTerminalService.submitOrder(
                 accountEntityPicker.getValue(),
                 apiKeyEntityPicker.getValue(),
                 symbolEntityPicker.getValue(),
-                null,
+                orderSide,
                 orderTypeCombo.getValue(),
                 leverage.getValue(),
                 priceField.getValue(),
                 qtyField.getValue()
         );
-
-
 
     }
 
