@@ -2,7 +2,7 @@ package ru.javaboys.wootify.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import groovy.transform.builder.Builder;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.Map;

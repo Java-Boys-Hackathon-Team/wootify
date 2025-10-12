@@ -304,24 +304,42 @@ public class TraderView extends StandardView {
                 .navigate();
     }
 
-    @Supply(to = "positionsTable.actions", subject = "renderer")
-    protected Renderer<Position> positionActionsRenderer() {
+    @Supply(to = "positionsTable.cancel", subject = "renderer")
+    protected Renderer<Position> positionCancelRenderer() {
         return new ComponentRenderer<>(position -> {
             HorizontalLayout layout = new HorizontalLayout();
             Button cancelBtn = new Button("Cancel", e -> onCancelPosition(position));
-            Button infoBtn = new Button("Info", e -> onInfoPosition(position));
-            layout.add(cancelBtn, infoBtn);
+            layout.add(cancelBtn);
             return layout;
         });
     }
 
-    @Supply(to = "ordersTable.actions", subject = "renderer")
-    protected Renderer<Order> ordersTableActionsRenderer() {
+    @Supply(to = "positionsTable.update", subject = "renderer")
+    protected Renderer<Position> positionUpdateRenderer() {
+        return new ComponentRenderer<>(position -> {
+            HorizontalLayout layout = new HorizontalLayout();
+            Button updateBtn = new Button("Update", e -> onUpdatePosition(position));
+            layout.add(updateBtn);
+            return layout;
+        });
+    }
+
+    @Supply(to = "ordersTable.cancel", subject = "renderer")
+    protected Renderer<Order> ordersTableCancelRenderer() {
         return new ComponentRenderer<>(order -> {
             HorizontalLayout layout = new HorizontalLayout();
             Button cancelBtn = new Button("Cancel", e -> onCancelOrder(order));
-            Button infoBtn = new Button("Info", e -> onInfoOrder(order));
-            layout.add(cancelBtn, infoBtn);
+            layout.add(cancelBtn);
+            return layout;
+        });
+    }
+
+    @Supply(to = "ordersTable.update", subject = "renderer")
+    protected Renderer<Order> ordersTableUpdateRenderer() {
+        return new ComponentRenderer<>(order -> {
+            HorizontalLayout layout = new HorizontalLayout();
+            Button updateBtn = new Button("Update", e -> onUpdateOrder(order));
+            layout.add(updateBtn);
             return layout;
         });
     }
@@ -368,8 +386,9 @@ public class TraderView extends StandardView {
         notifications.create("Отмена позиции: " + getSymbolSafe(position)).show();
     }
 
-    private void onInfoPosition(Position position) {
-        notifications.create("Инфо по позиции: " + getSymbolSafe(position)).show();
+    private void onUpdatePosition(Position position) {
+        // todo: логика обновления позиции
+        notifications.create("Обновление позиции: " + getSymbolSafe(position)).show();
     }
 
     private void onCancelOrder(Order order) {
@@ -377,8 +396,9 @@ public class TraderView extends StandardView {
         notifications.create("Отмена ордера: " + getSymbolSafe(order)).show();
     }
 
-    private void onInfoOrder(Order order) {
-        notifications.create("Инфо по ордеру: " + getSymbolSafe(order)).show();
+    private void onUpdateOrder(Order order) {
+        // todo: логика отмены ордера
+        notifications.create("Обновление ордера: " + getSymbolSafe(order)).show();
     }
 
     private String getSymbolSafe(Position position) {

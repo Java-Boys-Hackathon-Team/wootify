@@ -32,15 +32,15 @@ public class OrderServiceImpl implements OrderService{
 
         Order localOrder = createLocalOrder(account, apiKey, symbol, orderSide, position, orderType, price, quantity);
 
-//        OrderRequest request = OrderRequest.builder()
-//                .symbol(symbol.getAnalogTicker())
-//                .side(orderSide.name())
-//                .type(orderType.name())
-//                .amount(quantity.doubleValue())
-//                .price(price.doubleValue())
-//                .clientOrderId(localOrder.getId())
-//                .build();
-//
+        OrderRequest request = OrderRequest.builder()
+                .symbol(symbol.getAnalogTicker())
+                .side(orderSide.name())
+                .type(orderType.name())
+                .amount(quantity.doubleValue())
+                .price(price.doubleValue())
+                .clientOrderId(localOrder.getId().toString())
+                .build();
+
 //        OrderResponse response = orderClient.createOrder(
 //                apiKey.getKey(),
 //                apiKey.getSecret(),

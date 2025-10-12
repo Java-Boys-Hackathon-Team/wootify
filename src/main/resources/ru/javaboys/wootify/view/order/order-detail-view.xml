@@ -32,6 +32,38 @@
             <select id="sideField" property="side"/>
             <textField id="quantityField" property="quantity"/>
             <textField id="priceField" property="price"/>
+            <dateTimePicker property="createdDate"/>
+            <dateTimePicker property="sendingDate"/>
+            <dateTimePicker property="closedDate"/>
+            <select property="status"/>
+            <textField property="orderlyOrderId"/>
+            <textField property="totalFee"/>
+            <textField property="averageExecutedPrice"/>
+            <textField property="totalExecutedQuantity"/>
+            <entityPicker property="account">
+                <actions>
+                    <action id="entityLookupAction" type="entity_lookup"/>
+                    <action id="entityClearAction" type="entity_clear"/>
+                </actions>
+            </entityPicker>
+            <entityPicker property="apiKey">
+                <actions>
+                    <action id="entityLookupAction" type="entity_lookup"/>
+                    <action id="entityClearAction" type="entity_clear"/>
+                </actions>
+            </entityPicker>
+            <entityPicker property="position">
+                <actions>
+                    <action id="entityLookupAction" type="entity_lookup"/>
+                    <action id="entityClearAction" type="entity_clear"/>
+                </actions>
+            </entityPicker>
+            <entityPicker property="symbol">
+                <actions>
+                    <action id="entityLookupAction" type="entity_lookup"/>
+                    <action id="entityClearAction" type="entity_clear"/>
+                </actions>
+            </entityPicker>
         </formLayout>
         <hbox id="detailActions">
             <button id="saveAndCloseButton" action="saveAction"/>
