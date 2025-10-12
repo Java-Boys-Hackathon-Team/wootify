@@ -57,26 +57,48 @@
                             <action id="entityLookup" type="entity_lookup"/>
                         </actions>
                     </entityPicker>
+                </hbox>
 
+                <hbox>
                     <textField id="myAssets" label="My Assets (USDC)"/>
-
-                    <vbox spacing="false">
-                        <label text="  "/>
+                    <vbox>
                         <button id="assetsRefreshButton"
                                 text="Refresh Assets"
                                 icon="REFRESH"/>
                     </vbox>
                 </hbox>
 
-                <entityPicker id="symbolEntityPicker"
-                              metaClass="Symbol"
-                              property="name"
-                              label="Ticker">
-                    <actions>
-                        <action id="entityLookup" type="entity_lookup"/>
-                        <action id="entityClear" type="entity_clear"/>
-                    </actions>
-                </entityPicker>
+                <hbox>
+                    <entityPicker id="symbolEntityPicker"
+                                  metaClass="Symbol"
+                                  property="name"
+                                  label="Ticker">
+                        <actions>
+                            <action id="entityLookup" type="entity_lookup"/>
+                            <action id="entityClear" type="entity_clear"/>
+                        </actions>
+                    </entityPicker>
+                    <comboBox id="orderTypeCombo"
+                              label="Order Type"
+                              itemsEnum="ru.javaboys.wootify.enums.OrderType"/>
+                </hbox>
+
+                <hbox>
+                    <numberField id="leverage"
+                                 label="Leverage (x)"
+                                 min="1" max="100"
+                                 step="1"
+                                 value="10"
+                                 stepButtonsVisible="true"/>
+                    <button id="checkLeverageButton"
+                            text="Check"
+                            classNames="side-btn buy"
+                            width="25%"/>
+                    <button id="setLeverageButton"
+                            text="Set"
+                            classNames="side-btn buy"
+                            width="25%"/>
+                </hbox>
 
                 <vbox classNames="price-box" spacing="false" padding="false" width="fit-content">
                     <h4 text="Prices"/>
@@ -88,23 +110,6 @@
                 </vbox>
 
                 <vbox classNames="trade-box" spacing="true" width="fit-content">
-                    <hbox classNames="side-buttons">
-                        <button id="buyBtn" text="Buy" classNames="side-btn buy" width="50%"/>
-                        <button id="sellBtn" text="Sell" classNames="side-btn sell" width="50%"/>
-                    </hbox>
-
-                    <hbox>
-                        <comboBox id="orderTypeCombo"
-                                  label="Order Type"
-                                  itemsEnum="ru.javaboys.wootify.enums.OrderType"/>
-
-                        <numberField id="leverage"
-                                     label="Leverage (x)"
-                                     min="1" max="100"
-                                     step="1"
-                                     value="10"
-                                     stepButtonsVisible="true"/>
-                    </hbox>
 
                     <hbox classNames="order-fields">
                         <bigDecimalField id="priceField" label="Price" placeholder="0.00"/>
@@ -112,10 +117,17 @@
                         <bigDecimalField id="totalField" label="Total" placeholder="0.00"/>
                     </hbox>
 
-                    <button id="submitBtn"
-                            text="Buy / Long"
-                            classNames="trade-button buy"
-                            width="100%"/>
+                    <hbox classNames="side-buttons">
+                        <button id="buyButton"
+                                text="BUY"
+                                classNames="side-btn buy"
+                                width="50%"/>
+                        <button id="sellButton"
+                                text="SELL"
+                                classNames="side-btn sell"
+                                width="50%"/>
+                    </hbox>
+
                 </vbox>
             </vbox>
 
