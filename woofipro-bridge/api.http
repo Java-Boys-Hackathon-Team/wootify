@@ -118,3 +118,30 @@ Content-Type: application/json
   "leverage": 15,
   "marginMode": "isolated"
 }
+
+### Get current leverage (by symbol)
+GET {{baseUrl}}/positions/{{symbol}}/leverage?apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&brokerId={{wooBrokerId}}&env={{env}}
+X-API-Key: {{apiKey}}
+
+> {%
+    client.test("Accepted 200", function () {
+        client.assert(response.status === 200, "Expected 200");
+    });
+    const body = typeof response.body === 'string' ? JSON.parse(response.body) : response.body;
+    client.log("Leverage for {{symbol}} = " + body.leverage + " (source: " + body.source + ")");
+%}
+
+
+### Get current leverage + tiers (limits if supported)
+GET {{baseUrl}}/positions/{{symbol}}/leverage?include_tiers=true&apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&brokerId={{wooBrokerId}}&env={{env}}
+X-API-Key: {{apiKey}}
+
+> {%
+    client.test("Accepted 200", function () {
+        client.assert(response.status === 200, "Expected 200");
+    });
+    const body = typeof response.body === 'string' ? JSON.parse(response.body) : response.body;
+    client.log("Leverage = " + body.leverage);
+    if (body.tiers) client.log("Leverage tiers: " + JSON.stringify(body.tiers));
+    if (body.warning) client.log("Warning: " + body.warning);
+%}
