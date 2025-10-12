@@ -119,5 +119,29 @@ Content-Type: application/json
   "marginMode": "isolated"
 }
 
-### Get leverage
-GET http://localhost:8081/positions/1000SHIB/USDC:USDC/leverage?apiKey=ed25519%3A4m48K1tvUQ6SBa2WJmUL9d5nbywF192bghRCGC8aV2ry&apiSecret=7g8EQ1b7aaSvUizybX3WNsU5fGyTHVr9KbkiAkiFg6uj&accountId=0x8b83287bdb87e1f909387194f4fa34ec49f16727eaa80abf4518b6af0020d1b3&brokerId=woofi_pro&env=testnet
+### Get current leverage (by symbol)
+GET {{baseUrl}}/positions/{{symbol}}/leverage?apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&brokerId={{wooBrokerId}}&env={{env}}
+X-API-Key: {{apiKey}}
+
+> {%
+    client.test("Accepted 200", function () {
+        client.assert(response.status === 200, "Expected 200");
+    });
+    const body = typeof response.body === 'string' ? JSON.parse(response.body) : response.body;
+    client.log("Leverage for {{symbol}} = " + body.leverage + " (source: " + body.source + ")");
+%}
+
+
+### Get current leverage + tiers (limits if supported)
+GET {{baseUrl}}/positions/{{symbol}}/leverage?include_tiers=true&apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&brokerId={{wooBrokerId}}&env={{env}}
+X-API-Key: {{apiKey}}
+
+> {%
+    client.test("Accepted 200", function () {
+        client.assert(response.status === 200, "Expected 200");
+    });
+    const body = typeof response.body === 'string' ? JSON.parse(response.body) : response.body;
+    client.log("Leverage = " + body.leverage);
+    if (body.tiers) client.log("Leverage tiers: " + JSON.stringify(body.tiers));
+    if (body.warning) client.log("Warning: " + body.warning);
+%}
