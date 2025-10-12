@@ -156,7 +156,8 @@
                         <column property="averageOpenPrice"/>
                         <column property="realizedPnl"/>
                         <column property="status"/>
-                        <column key="actions"/>
+                        <column key="cancel"/>
+                        <column key="update"/>
                     </columns>
                 </dataGrid>
 
@@ -172,7 +173,8 @@
                         <column property="averageExecutedPrice"/>
                         <column property="totalExecutedQuantity"/>
                         <column property="status"/>
-                        <column key="actions"/>
+                        <column key="cancel"/>
+                        <column key="update"/>
                     </columns>
                 </dataGrid>
 
