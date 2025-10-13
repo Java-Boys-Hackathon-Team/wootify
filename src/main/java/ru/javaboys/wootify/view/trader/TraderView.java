@@ -36,6 +36,8 @@ import io.jmix.flowui.view.ViewComponent;
 import io.jmix.flowui.view.ViewController;
 import io.jmix.flowui.view.ViewDescriptor;
 import lombok.extern.slf4j.Slf4j;
+import ru.javaboys.wootify.dto.trade.CurrentAccountState;
+import ru.javaboys.wootify.dto.trade.CurrentDealState;
 import ru.javaboys.wootify.entity.Account;
 import ru.javaboys.wootify.entity.ApiKey;
 import ru.javaboys.wootify.entity.Order;
@@ -47,7 +49,8 @@ import ru.javaboys.wootify.entity.PositionStatus;
 import ru.javaboys.wootify.entity.Symbol;
 import ru.javaboys.wootify.orderly.client.OrderlyStreamingClient;
 import ru.javaboys.wootify.service.AssetsService;
-import ru.javaboys.wootify.service.PositionSevice;
+import ru.javaboys.wootify.service.OrderService;
+import ru.javaboys.wootify.service.PositionService;
 import ru.javaboys.wootify.service.TradingTerminalService;
 import ru.javaboys.wootify.view.main.MainView;
 
@@ -62,12 +65,8 @@ public class TraderView extends StandardView {
     @ViewComponent private EntityPicker<Symbol> symbolEntityPicker;
 
     @ViewComponent private JmixComboBox<OrderType> orderTypeCombo;
-    @ViewComponent private JmixButton assetsRefreshButton;
     @ViewComponent private TextField myAssets;
 
-    @ViewComponent private JmixButton buyBtn;
-    @ViewComponent private JmixButton sellBtn;
-    @ViewComponent private JmixButton submitBtn;
     @ViewComponent private JmixButton createPositionBtn;
     @ViewComponent private JmixButton createOrderBtn;
 
@@ -88,13 +87,13 @@ public class TraderView extends StandardView {
     @Autowired private TradingTerminalService tradingTerminalService;
     @Autowired private Notifications notifications;
     @Autowired private AssetsService assetsService;
-    @Autowired private PositionSevice positionSevice;
+    @Autowired private PositionService positionService;
+    @Autowired private OrderService orderService;
     @Autowired private ViewNavigators viewNavigators;
     @Autowired private Metadata metadata;
     @Value("${orderly.account-id}") private String accountId;
 
     private OrderlyStreamingClient streamingClient;
-    private OrderSide orderSide = OrderSide.BUY;
 
     @Subscribe
     public void onBeforeShow(final BeforeShowEvent event) {
@@ -187,20 +186,29 @@ public class TraderView extends StandardView {
 
     @Subscribe("checkLeverageButton")
     public void onCheckLeverageButton(ClickEvent<JmixButton> event) {
-        //Добавить проверку Leverage для Тикера
-        notifications.create("Not supported yet")
-                .withType(Notifications.Type.SUCCESS)
-                .show();
+        Double currentLeverage = leverage.getValue();
+        Double leverageValue = positionService.getLeverageForTicker(
+                getCurrentAccountState(),
+                getCurrentDealState()
+        );
+
+        if (leverageValue.equals(currentLeverage)) {
+            notifications.create("That's ok")
+                    .withType(Notifications.Type.SUCCESS)
+                    .show();
+        } else {
+            notifications.create("Current leverage" + currentLeverage + ", Server leverage " + leverageValue)
+                    .withType(Notifications.Type.WARNING)
+                    .show();
+        }
     }
 
     @Subscribe("setLeverageButton")
     public void onSetLeverageButton(ClickEvent<JmixButton> event) {
         Double leverageBefore = leverage.getValue();
-        Double leverageValue = positionSevice.setLeverageForTicker(
-                accountEntityPicker.getValue(),
-                apiKeyEntityPicker.getValue(),
-                leverageBefore,
-                symbolEntityPicker.getValue()
+        Double leverageValue = positionService.setLeverageForTicker(
+                getCurrentAccountState(),
+                getCurrentDealState()
         );
         leverage.setValue(leverageValue);
 
@@ -225,19 +233,32 @@ public class TraderView extends StandardView {
         onTradeButtonClick(OrderSide.SELL);
     }
 
-    public void onTradeButtonClick(OrderSide orderSide) {
+    private void onTradeButtonClick(OrderSide orderSide) {
+        CurrentDealState currentDealState = getCurrentDealState();
+        currentDealState.setOrderSide(orderSide);
+        tradingTerminalService.submitOrder(getCurrentAccountState(), currentDealState);
 
-        tradingTerminalService.submitOrder(
-                accountEntityPicker.getValue(),
-                apiKeyEntityPicker.getValue(),
-                symbolEntityPicker.getValue(),
-                orderSide,
-                orderTypeCombo.getValue(),
-                leverage.getValue(),
-                priceField.getValue(),
-                qtyField.getValue()
-        );
+        notifications.create("Ордер создан и отправлен").show();
 
+        //Изменения на форме
+    }
+
+    private CurrentAccountState getCurrentAccountState() {
+        return CurrentAccountState.builder()
+                .account(accountEntityPicker.getValue())
+                .apiKey(apiKeyEntityPicker.getValue())
+                .build();
+    }
+
+    private CurrentDealState getCurrentDealState() {
+        return CurrentDealState.builder()
+                .symbol(symbolEntityPicker.getValue())
+                .orderSide(null)
+                .orderType(orderTypeCombo.getValue())
+                .leverage(leverage.getValue())
+                .price(priceField.getValue())
+                .quantity(qtyField.getValue())
+                .build();
     }
 
     private void reloadPositions() {
@@ -293,7 +314,7 @@ public class TraderView extends StandardView {
         newOrder.setSymbol(selectedPosition.getSymbol());
         newOrder.setCreatedDate(LocalDateTime.now());
 
-        newOrder.setSide(orderSide);
+        newOrder.setSide(OrderSide.BUY);
         newOrder.setType(orderTypeCombo.getValue());
         newOrder.setStatus(OrderStatus.CREATED);
 
@@ -392,13 +413,13 @@ public class TraderView extends StandardView {
     }
 
     private void onCancelOrder(Order order) {
-        // todo: логика отмены ордера
+        orderService.cancelOrder(getCurrentAccountState(), order);
         notifications.create("Отмена ордера: " + getSymbolSafe(order)).show();
     }
 
     private void onUpdateOrder(Order order) {
-        // todo: логика отмены ордера
-        notifications.create("Обновление ордера: " + getSymbolSafe(order)).show();
+        orderService.updateOrderStatus(getCurrentAccountState(), order);
+        notifications.create("Статус ордера обновлен: " + getSymbolSafe(order)).show();
     }
 
     private String getSymbolSafe(Position position) {

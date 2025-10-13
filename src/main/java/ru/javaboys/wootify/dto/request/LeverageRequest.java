@@ -9,5 +9,4 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LeverageRequest {
     private Integer leverage;
-    private String marginMode;
 }

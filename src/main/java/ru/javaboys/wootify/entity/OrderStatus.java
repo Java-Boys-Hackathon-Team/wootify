@@ -8,10 +8,12 @@ import org.springframework.lang.Nullable;
 public enum OrderStatus implements EnumClass<String> {
 
     CREATED("CREATED"),
-    NEW("NEW"),
-    FILLED("FILLED"),
-    PARTIAL_FILLED("PARTIAL_FILLED"),
-    CANCELLED("CANCELLED");
+    SENT_OPEN("SENT_OPEN"),
+    OPEN("OPEN"),
+    SENT_CANCEL("SENT_CANCEL"),
+    CANCELLED("CANCELLED"),
+    CLOSED("CLOSED"),
+    ERROR("ERROR");
 
     private final String id;
 

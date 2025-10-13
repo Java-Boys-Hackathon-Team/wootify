@@ -2,14 +2,7 @@ package ru.javaboys.wootify.entity;
 
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.metamodel.annotation.JmixEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -83,6 +76,17 @@ public class Order {
 
     @Column(name = "REALIZED_PNL", precision = 19, scale = 10)
     private BigDecimal realizedPnl;
+
+    @Column(name = "WOOFI_STATUS")
+    private String woofiStatus;
+
+    public String getWoofiStatus() {
+        return woofiStatus;
+    }
+
+    public void setWoofiStatus(String woofiStatus) {
+        this.woofiStatus = woofiStatus;
+    }
 
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;

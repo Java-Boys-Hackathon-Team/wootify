@@ -10,7 +10,7 @@
 @wooBrokerId = woofi_pro
 @env = testnet
 
-@order_id = 2776116278
+@order_id = 2776119174
 
 
 ### Health check
@@ -49,7 +49,7 @@ Content-Type: application/json
   "side": "sell",
   "type": "market",
 
-  "amount": 10,
+  "amount": 1,
   "clientOrderId": "bot-{{$timestamp}}"
 }
 

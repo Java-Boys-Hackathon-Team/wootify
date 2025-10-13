@@ -5,14 +5,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.javaboys.wootify.client.LeverageClient;
 import ru.javaboys.wootify.dto.request.LeverageRequest;
+import ru.javaboys.wootify.dto.response.LeverageGetResponse;
 import ru.javaboys.wootify.dto.response.LeverageResponse;
+import ru.javaboys.wootify.dto.trade.CurrentAccountState;
+import ru.javaboys.wootify.dto.trade.CurrentDealState;
 import ru.javaboys.wootify.entity.*;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
 @Service
-public class PositionServiceImpl implements PositionSevice{
+public class PositionServiceImpl implements PositionService {
 
     @Autowired
     private LeverageClient leverageClient;
@@ -21,16 +24,16 @@ public class PositionServiceImpl implements PositionSevice{
 
 
     @Override
-    public Double setLeverageForTicker(Account account, ApiKey apiKey, Double leverage, Symbol symbol) {
+    public Double setLeverageForTicker(CurrentAccountState accountState, CurrentDealState dealState) {
         LeverageRequest request = new LeverageRequest();
-        request.setLeverage(leverage.intValue());
+        request.setLeverage(dealState.getLeverage().intValue());
 
         LeverageResponse leverageResponse = leverageClient.setLeverage(
-                symbol.getAnalogTicker(),
-                apiKey.getKey(),
-                apiKey.getSecret(),
-                account.getWoofiId(),
-                apiKey.getEnv(),
+                dealState.getSymbol().getAnalogTicker(),
+                accountState.getApiKey().getKey(),
+                accountState.getApiKey().getSecret(),
+                accountState.getAccount().getWoofiId(),
+                accountState.getApiKey().getEnv(),
                 request
         );
 
@@ -53,27 +56,41 @@ public class PositionServiceImpl implements PositionSevice{
         return 0.0;
     }
 
-    public Position getActivePositionForTicker(Account account, ApiKey apiKey, Symbol symbol) {
+    @Override
+    public Double getLeverageForTicker(CurrentAccountState accountState, CurrentDealState dealState) {
+        LeverageGetResponse leverageGetResponse = leverageClient.getLeverage(
+                dealState.getSymbol().getAnalogTicker(),
+                accountState.getApiKey().getKey(),
+                accountState.getApiKey().getSecret(),
+                accountState.getAccount().getWoofiId(),
+                accountState.getApiKey().getBrokerId(),
+                accountState.getApiKey().getEnv()
+        );
+
+        return (double) leverageGetResponse.getLeverage();
+    }
+
+    public Position getActivePositionForTicker(CurrentAccountState accountState, Symbol symbol) {
         return dataManager.load(Position.class)
                 .query("select p from Position_ p where p.account = :account and p.symbol = :symbol " +
                         "and p.apiKey = :apiKey and p.status in (:st1, :st2)")
-                .parameter("account", account)
+                .parameter("account", accountState.getAccount())
                 .parameter("symbol", symbol)
-                .parameter("apiKey", apiKey)
+                .parameter("apiKey", accountState.getApiKey())
                 .parameter("st1", PositionStatus.CREATED.getId())
                 .parameter("st2", PositionStatus.OPENED.getId())
                 .optional()
                 .orElse(null);
     }
 
-    public Position createPositionForTicker(Account account, ApiKey apiKey, Symbol symbol, Double leverage) {
+    public Position createPositionForTicker(CurrentAccountState accountState, CurrentDealState dealState) {
         Position position = dataManager.create(Position.class);
-        position.setAccount(account);
-        position.setApiKey(apiKey);
-        position.setSymbol(symbol);
+        position.setAccount(accountState.getAccount());
+        position.setApiKey(accountState.getApiKey());
+        position.setSymbol(dealState.getSymbol());
         position.setStatus(PositionStatus.CREATED);
         position.setCreatedDate(LocalDateTime.now());
-        position.setLeverage(leverage); // можно задать дефолтное значение
+        position.setLeverage(dealState.getLeverage());
         position = dataManager.save(position);
 
         return position;
