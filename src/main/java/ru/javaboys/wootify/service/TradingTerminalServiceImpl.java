@@ -1,36 +1,28 @@
 package ru.javaboys.wootify.service;
 
-import io.jmix.core.DataManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.javaboys.wootify.dto.trade.CurrentAccountState;
+import ru.javaboys.wootify.dto.trade.CurrentDealState;
 import ru.javaboys.wootify.entity.*;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Service
 public class TradingTerminalServiceImpl implements TradingTerminalService{
 
     @Autowired
-    private PositionSevice positionSevice;
+    private PositionService positionService;
     @Autowired
     private OrderService orderService;
 
     @Override
-    public void submitOrder(Account account, ApiKey apiKey, Symbol symbol, OrderSide orderSide,
-                            OrderType orderType, Double leverage, BigDecimal price, BigDecimal quantity) {
+    public void submitOrder(CurrentAccountState accountState, CurrentDealState dealState) {
 
-        Position currentPosition = positionSevice.getActivePositionForTicker(account, apiKey, symbol);
+        Position currentPosition = positionService.getActivePositionForTicker(accountState, dealState.getSymbol());
         if (currentPosition == null) {
-            currentPosition = positionSevice.createPositionForTicker(account, apiKey, symbol, leverage);
+            currentPosition = positionService.createPositionForTicker(accountState,  dealState);
         }
 
-        Order order = orderService.createOrder(account, apiKey, symbol, orderSide,
-                            currentPosition, orderType, price, quantity);
-
-
-
-
+        Order order = orderService.createOrder(accountState,  dealState, currentPosition);
 
     }
 

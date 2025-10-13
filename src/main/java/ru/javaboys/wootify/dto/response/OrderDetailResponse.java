@@ -39,5 +39,6 @@ public class OrderDetailResponse {
     private List<Map<String, Object>> trades;
     private OrderDetailFeeResponse fee;
     private List<OrderDetailFeeResponse> fees;
-    private Map<String, Object> info;
+    //private Map<String, Object> info;
+    private OrderDetailsResponseInfo info;
 }
