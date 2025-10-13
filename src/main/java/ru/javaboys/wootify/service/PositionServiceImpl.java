@@ -4,24 +4,33 @@ import io.jmix.core.DataManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.javaboys.wootify.client.LeverageClient;
+import ru.javaboys.wootify.client.PositionClient;
 import ru.javaboys.wootify.dto.request.LeverageRequest;
 import ru.javaboys.wootify.dto.response.LeverageGetResponse;
 import ru.javaboys.wootify.dto.response.LeverageResponse;
+import ru.javaboys.wootify.dto.response.PositionResponse;
+import ru.javaboys.wootify.dto.response.PositionsResponse;
 import ru.javaboys.wootify.dto.trade.CurrentAccountState;
 import ru.javaboys.wootify.dto.trade.CurrentDealState;
+import ru.javaboys.wootify.dto.trade.PositionStateResponse;
 import ru.javaboys.wootify.entity.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.function.ToDoubleBiFunction;
 
 @Service
 public class PositionServiceImpl implements PositionService {
 
     @Autowired
+    private PositionClient positionClient;
+    @Autowired
     private LeverageClient leverageClient;
     @Autowired
     private DataManager dataManager;
-
+    @Autowired
+    private OrderService orderService;
 
     @Override
     public Double setLeverageForTicker(CurrentAccountState accountState, CurrentDealState dealState) {
@@ -96,5 +105,111 @@ public class PositionServiceImpl implements PositionService {
         return position;
     }
 
+    @Override
+    public void updatePositionInfo(Position position) {
+
+        boolean positionPreCloseCancel = position.getStatus().equals(PositionStatus.PRE_CLOSE_CANCEL);
+
+        if (positionPreCloseCancel) {
+            if (checkClosedOfOrdersForPosition(position)) {
+                throw new IllegalStateException("There are still unclosed orders for this position" + position);
+            }
+        }
+
+        PositionStateResponse positionState = getPositionStateResponse(position, "closePosition");
+
+        if (positionState.getPositionsCount() == 0 & positionPreCloseCancel) {
+            position.setStatus(PositionStatus.CLOSED);
+            // TODO Обработать ситуацию с CANCELLED
+            position.setClosedDate(LocalDateTime.now());
+            dataManager.save(position);
+
+            // TODO Добавить расчет PNL сделки
+
+        }
+
+        // TODO Требуется дополнительная обработка этой ситуации
+        if (positionState.getPositionsCount() == 0 & position.getStatus().equals(PositionStatus.OPENED)) {
+            position.setStatus(PositionStatus.CLOSED);
+            position.setClosedDate(LocalDateTime.now());
+            dataManager.save(position);
+        }
+
+        PositionResponse posResponse = positionState.getPositionResponse();
+        if (posResponse != null) {
+            position.setPositionQty(BigDecimal.valueOf(posResponse.getContracts()));
+            position.setAverageOpenPrice(BigDecimal.valueOf(posResponse.getEntryPrice()));
+            position.setStatus(PositionStatus.OPENED);
+            dataManager.save(position);
+        }
+    }
+
+    private Boolean checkClosedOfOrdersForPosition(Position position) {
+        // Возврат = есть хотя бы один Ордер по Позиции не в статусе CANCELLED или CLOSED
+        Long count = dataManager.loadValue(
+                        "select count(o) from Order_ o " +
+                                "where o.position = :pos " +
+                                "and o.status not in ('CANCELLED', 'CLOSED')", Long.class)
+                .parameter("pos", position)
+                .one();
+
+        return count > 0;
+    }
+
+    @Override
+    public void closePosition(Position position) {
+        PositionStateResponse positionState = getPositionStateResponse(position, "closePosition");
+
+        if (positionState.getPositionsCount() == 0)
+            throw new IllegalStateException("Attempt to close an unopened position: " + position);;
+
+        PositionResponse posResponse = positionState.getPositionResponse();
+        if (posResponse == null) return;
+
+        Double contractsQuantity = posResponse.getContracts();
+
+        if (contractsQuantity.equals(0.0)) return;
+
+        CurrentDealState dealState = CurrentDealState.builder()
+                .symbol(position.getSymbol())
+                .orderType(OrderType.MARKET)
+                .orderSide(contractsQuantity >= 0 ? OrderSide.SELL : OrderSide.BUY)
+                .quantity(BigDecimal.valueOf(contractsQuantity))
+                .build();
+
+        CurrentAccountState accountState = CurrentAccountState.builder()
+                .account(position.getAccount())
+                .apiKey(position.getApiKey())
+                .build();
+
+        Order closeOrder = orderService.createOrder(accountState, dealState, position);
+
+        position.setStatus(PositionStatus.PRE_CLOSE_CANCEL);
+        dataManager.save(position);
+
+    }
+
+    private PositionStateResponse getPositionStateResponse(Position position, String callingMethod) {
+
+        PositionsResponse response = positionClient.getPositions(
+                position.getSymbol().getAnalogTicker(),
+                true,
+                position.getApiKey().getKey(),
+                position.getApiKey().getSecret(),
+                position.getAccount().getWoofiId(),
+                position.getApiKey().getEnv()
+        );
+
+        if (response == null) {
+            throw new IllegalStateException(callingMethod + ": empty response");
+        }
+
+        PositionStateResponse stateResponse = PositionStateResponse.builder()
+                .positionsCount(response.getCount())
+                .build();
+        if (response.getCount() > 0) stateResponse.setPositionResponse(response.getPositions().getFirst());
+
+        return stateResponse;
+    }
 
 }

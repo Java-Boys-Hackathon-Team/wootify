@@ -48,9 +48,9 @@
             </entityPicker>
             <dateTimePicker id="closedDateField" property="closedDate"/>
             <textField id="leverageField" property="leverage"/>
-            <textField id="positionQtyField" property="positionQty"/>
-            <textField id="averageOpenPriceField" property="averageOpenPrice"/>
-            <textField id="realizedPnlField" property="realizedPnl"/>
+            <bigDecimalField id="positionQtyField" property="positionQty"/>
+            <bigDecimalField id="averageOpenPriceField" property="averageOpenPrice"/>
+            <bigDecimalField id="realizedPnlField" property="realizedPnl"/>
         </formLayout>
         <hbox id="detailActions">
             <button id="saveAndCloseButton" action="saveAction"/>

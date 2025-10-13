@@ -27,6 +27,10 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public Order createOrder(CurrentAccountState accountState, CurrentDealState dealState, Position position) {
 
+        if (position.getStatus().equals(PositionStatus.PRE_CLOSE_CANCEL)) {
+            throw new IllegalStateException("Order not be created because position status is CLOSE_CANCEL");
+        }
+
         Order localOrder = createLocalOrder(accountState, dealState, position);
 
         OrderRequest request = OrderRequest.builder()

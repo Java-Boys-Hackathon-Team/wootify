@@ -1,7 +1,6 @@
 package ru.javaboys.wootify.view.trader;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,10 +41,8 @@ import ru.javaboys.wootify.entity.Account;
 import ru.javaboys.wootify.entity.ApiKey;
 import ru.javaboys.wootify.entity.Order;
 import ru.javaboys.wootify.entity.OrderSide;
-import ru.javaboys.wootify.entity.OrderStatus;
 import ru.javaboys.wootify.entity.OrderType;
 import ru.javaboys.wootify.entity.Position;
-import ru.javaboys.wootify.entity.PositionStatus;
 import ru.javaboys.wootify.entity.Symbol;
 import ru.javaboys.wootify.orderly.client.OrderlyStreamingClient;
 import ru.javaboys.wootify.service.AssetsService;
@@ -66,9 +63,6 @@ public class TraderView extends StandardView {
 
     @ViewComponent private JmixComboBox<OrderType> orderTypeCombo;
     @ViewComponent private TextField myAssets;
-
-    @ViewComponent private JmixButton createPositionBtn;
-    @ViewComponent private JmixButton createOrderBtn;
 
     @ViewComponent private NumberField leverage;
     @ViewComponent private BigDecimalField priceField;
@@ -114,9 +108,6 @@ public class TraderView extends StandardView {
     public void onInit(InitEvent event) {
         orderTypeCombo.setItems(OrderType.values());
         orderTypeCombo.setValue(OrderType.MARKET);
-
-        createPositionBtn.addClickListener(this::onCreatePositionClick);
-        createOrderBtn.addClickListener(this::onCreateOrderClick);
     }
 
     @Subscribe("positionsTable")
@@ -268,69 +259,12 @@ public class TraderView extends StandardView {
         positionsDl.load();
     }
 
-    private void onCreatePositionClick(ClickEvent<Button> event) {
-        Position newPosition = metadata.create(Position.class);
-
-        newPosition.setApiKey(apiKeyEntityPicker.getValue());
-        newPosition.setAccount(accountEntityPicker.getValue());
-        newPosition.setSymbol(symbolEntityPicker.getValue());
-
-        newPosition.setStatus(PositionStatus.CREATED);
-        newPosition.setCreatedDate(LocalDateTime.now());
-
-        if (leverage.getValue() != null) {
-            newPosition.setLeverage(leverage.getValue());
-        }
-        if (qtyField.getValue() != null) {
-            newPosition.setPositionQty(qtyField.getValue());
-        }
-        if (priceField.getValue() != null) {
-            newPosition.setAverageOpenPrice(priceField.getValue());
-        }
-
-        newPosition.setRealizedPnl(BigDecimal.ZERO);
-
-        // Переход на форму редактирования с новым объектом
-        viewNavigators.detailView(this, Position.class)
-                .newEntity()
-                .withBackwardNavigation(true)
-                .navigate();
-    }
-
-    private void onCreateOrderClick(ClickEvent<Button> event) {
-        Position selectedPosition = positionsDc.getItem();
-        if (selectedPosition == null) {
-            notifications.create("Выберите позицию для создания ордера")
-                    .withType(Notifications.Type.WARNING)
-                    .show();
-            return;
-        }
-
-        Order newOrder = metadata.create(Order.class);
-
-        newOrder.setPosition(selectedPosition);
-        newOrder.setAccount(selectedPosition.getAccount());
-        newOrder.setApiKey(selectedPosition.getApiKey());
-        newOrder.setSymbol(selectedPosition.getSymbol());
-        newOrder.setCreatedDate(LocalDateTime.now());
-
-        newOrder.setSide(OrderSide.BUY);
-        newOrder.setType(orderTypeCombo.getValue());
-        newOrder.setStatus(OrderStatus.CREATED);
-
-        // Остальные поля будут заполняться в форме
-        viewNavigators.detailView(this, Order.class)
-                .newEntity()
-                .withBackwardNavigation(true)
-                .navigate();
-    }
-
-    @Supply(to = "positionsTable.cancel", subject = "renderer")
+    @Supply(to = "positionsTable.close", subject = "renderer")
     protected Renderer<Position> positionCancelRenderer() {
         return new ComponentRenderer<>(position -> {
             HorizontalLayout layout = new HorizontalLayout();
-            Button cancelBtn = new Button("Cancel", e -> onCancelPosition(position));
-            layout.add(cancelBtn);
+            Button closeBtn = new Button("Close Market", e -> onClosePosition(position));
+            layout.add(closeBtn);
             return layout;
         });
     }
@@ -402,24 +336,37 @@ public class TraderView extends StandardView {
         }
     }
 
-    private void onCancelPosition(Position position) {
-        // todo: логика отмены позиции
-        notifications.create("Отмена позиции: " + getSymbolSafe(position)).show();
+    private void onClosePosition(Position position) {
+        positionService.closePosition(position);
+        notifications.create("Закрытие позиции: " + getSymbolSafe(position)).show();
     }
 
     private void onUpdatePosition(Position position) {
-        // todo: логика обновления позиции
-        notifications.create("Обновление позиции: " + getSymbolSafe(position)).show();
+        positionService.updatePositionInfo(position);
+        notifications.create("Обновление позиции: " + getSymbolSafe(position))
+                .withType(Notifications.Type.SUCCESS)
+                .show();
     }
 
     private void onCancelOrder(Order order) {
+        if (order.getType().equals(OrderType.MARKET)) {
+            notifications.create("Отмена ордера c типом MARKET невозможна!")
+                    .withType(Notifications.Type.ERROR)
+                    .show();
+            return;
+        }
+
         orderService.cancelOrder(getCurrentAccountState(), order);
-        notifications.create("Отмена ордера: " + getSymbolSafe(order)).show();
+        notifications.create("Отмена ордера: " + getSymbolSafe(order))
+                .withType(Notifications.Type.SUCCESS)
+                .show();
     }
 
     private void onUpdateOrder(Order order) {
         orderService.updateOrderStatus(getCurrentAccountState(), order);
-        notifications.create("Статус ордера обновлен: " + getSymbolSafe(order)).show();
+        notifications.create("Статус ордера обновлен: " + getSymbolSafe(order))
+                .withType(Notifications.Type.SUCCESS)
+                .show();
     }
 
     private String getSymbolSafe(Position position) {

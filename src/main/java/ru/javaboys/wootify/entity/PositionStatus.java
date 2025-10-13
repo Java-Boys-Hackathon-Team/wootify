@@ -9,6 +9,7 @@ public enum PositionStatus implements EnumClass<String> {
 
     CREATED("CREATED"),
     OPENED("OPENED"),
+    PRE_CLOSE_CANCEL("PRE_CLOSE_CANCEL"),
     CLOSED("CLOSED"),
     CANCELLED("CANCELLED");
 

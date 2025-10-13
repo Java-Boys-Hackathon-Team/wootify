@@ -1,7 +1,7 @@
 ### Variables
 @baseUrl = http://localhost:8081
 @apiKey = test
-@symbol = LINK/USDC:USDC
+@symbol = ADA/USDC:USDC
 
 # Перекрытия ключей/среды для CCXT (заполни своими значениями)
 @wooApiKey = ed25519:4m48K1tvUQ6SBa2WJmUL9d5nbywF192bghRCGC8aV2ry
@@ -94,7 +94,7 @@ X-API-Key: {{apiKey}}
 
 
 ### Get positions
-GET {{baseUrl}}/positions?only_open=false&apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&brokerId={{wooBrokerId}}&env={{env}}
+GET {{baseUrl}}/positions?only_open=false&symbol={{symbol}}&apiKey={{wooApiKey}}&apiSecret={{wooApiSecret}}&accountId={{wooAccountId}}&brokerId={{wooBrokerId}}&env={{env}}
 X-API-Key: {{apiKey}}
 
 
