@@ -18,7 +18,6 @@ import ru.javaboys.wootify.entity.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.function.ToDoubleBiFunction;
 
 @Service
 public class PositionServiceImpl implements PositionService {
@@ -116,7 +115,7 @@ public class PositionServiceImpl implements PositionService {
             }
         }
 
-        PositionStateResponse positionState = getPositionStateResponse(position, "closePosition");
+        PositionStateResponse positionState = getPositionStateResponse(position, "updatePosition");
 
         if (positionState.getPositionsCount() == 0 & positionPreCloseCancel) {
             position.setStatus(PositionStatus.CLOSED);
