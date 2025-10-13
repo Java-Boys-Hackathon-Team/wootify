@@ -11,4 +11,7 @@ public interface PositionService {
 
     Position getActivePositionForTicker(CurrentAccountState accountState, Symbol symbol);
     Position createPositionForTicker(CurrentAccountState accountState, CurrentDealState dealState);
+
+    void updatePositionInfo(Position position);
+    void closePosition(Position position);
 }
