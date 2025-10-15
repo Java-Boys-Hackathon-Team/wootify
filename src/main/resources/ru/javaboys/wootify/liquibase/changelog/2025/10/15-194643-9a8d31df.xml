@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1" author="wootify">
+        <createTable tableName="BOT">
+            <column name="ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_BOT"/>
+            </column>
+            <column name="SYMBOL_ID" type="UUID"/>
+            <column name="NAME" type="VARCHAR(255)"/>
+            <column name="START_DATE_TIME" type="DATETIME"/>
+            <column name="END_DATE_TIME" type="DATETIME"/>
+            <column name="ERROR_MESSAGE" type="CLOB"/>
+            <column name="DESIRED_STATE" type="VARCHAR(255)"/>
+            <column name="RUNTIME_STATE" type="VARCHAR(255)"/>
+            <column name="LAST_HEART_BEAT" type="INT"/>
+            <column name="OWNER_INSTANCE" type="UUID"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="2" author="wootify">
+        <createTable tableName="BOT_SETTINGS">
+            <column name="ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_BOT_SETTINGS"/>
+            </column>
+            <column name="SYMBOL_ID" type="UUID"/>
+            <column name="TRADE_TYPE" type="VARCHAR(255)"/>
+            <column name="DEPOSIT" type="DECIMAL(19, 10)"/>
+            <column name="LEVERAGE" type="DOUBLE"/>
+            <column name="OVERLAP_PERSENT" type="INT"/>
+            <column name="ORDERS_QUANTITY" type="INT"/>
+            <column name="PROFIT_PERSENT" type="DOUBLE"/>
+            <column name="POSITION_ID" type="UUID"/>
+            <column name="STATE" type="VARCHAR(255)"/>
+            <column name="BOT_ID" type="UUID"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="3" author="wootify">
+        <createIndex indexName="IDX_BOT_SETTINGS_BOT" tableName="BOT_SETTINGS">
+            <column name="BOT_ID"/>
+        </createIndex>
+
+        <addForeignKeyConstraint baseColumnNames="BOT_ID" baseTableName="BOT_SETTINGS"
+                                 constraintName="FK_BOT_SETTINGS_ON_BOT" referencedColumnNames="ID"
+                                 referencedTableName="BOT"/>
+    </changeSet>
+    <changeSet id="4" author="wootify">
+        <createIndex indexName="IDX_BOT_SETTINGS_POSITION" tableName="BOT_SETTINGS">
+            <column name="POSITION_ID"/>
+        </createIndex>
+
+        <addForeignKeyConstraint baseColumnNames="POSITION_ID" baseTableName="BOT_SETTINGS"
+                                 constraintName="FK_BOT_SETTINGS_ON_POSITION" referencedColumnNames="ID"
+                                 referencedTableName="POSITION_"/>
+    </changeSet>
+    <changeSet id="5" author="wootify">
+        <createIndex indexName="IDX_BOT_SETTINGS_SYMBOL" tableName="BOT_SETTINGS">
+            <column name="SYMBOL_ID"/>
+        </createIndex>
+
+        <addForeignKeyConstraint baseColumnNames="SYMBOL_ID" baseTableName="BOT_SETTINGS"
+                                 constraintName="FK_BOT_SETTINGS_ON_SYMBOL" referencedColumnNames="ID"
+                                 referencedTableName="SYMBOL"/>
+    </changeSet>
+    <changeSet id="6" author="wootify">
+        <createIndex indexName="IDX_BOT_SYMBOL" tableName="BOT">
+            <column name="SYMBOL_ID"/>
+        </createIndex>
+
+        <addForeignKeyConstraint baseColumnNames="SYMBOL_ID" baseTableName="BOT" constraintName="FK_BOT_ON_SYMBOL"
+                                 referencedColumnNames="ID" referencedTableName="SYMBOL"/>
+    </changeSet>
+</databaseChangeLog>
