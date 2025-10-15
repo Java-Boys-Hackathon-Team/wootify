@@ -159,7 +159,8 @@
                     <columns>
                         <column property="symbol.name"/>
                         <column property="status"/>
-                        <column property="createdDate"/>
+                        <column property="side"/>
+                        <column property="type"/>
                         <column property="price"/>
                         <column property="quantity"/>
                         <column property="averageExecutedPrice"/>

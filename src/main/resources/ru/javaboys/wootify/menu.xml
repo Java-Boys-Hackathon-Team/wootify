@@ -4,6 +4,8 @@
     <item view="TraderView" title="msg://ru.javaboys.wootify.view.trader/traderView.title"/>
 
     <menu id="tradings" title="msg://ru.javaboys.wootify/menu.tradings.title" opened="true">
+        <item view="Bot.list" title="msg://ru.javaboys.wootify.view.bot/botListView.title"/>
+        <item view="BotSettings.list" title="msg://ru.javaboys.wootify.view.botsettings/botSettingsListView.title"/>
         <item view="Position_.list" title="msg://ru.javaboys.wootify.view.position/positionListView.title"/>
         <item view="Order_.list" title="msg://ru.javaboys.wootify.view.order/orderListView.title"/>
     </menu>

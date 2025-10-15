@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://botSettingsDetailView.title"
+      focusComponent="form">
+    <data>
+        <instance id="botSettingsDc"
+                  class="ru.javaboys.wootify.entity.BotSettings">
+            <fetchPlan extends="_base">
+                <property name="symbol" fetchPlan="_base"/>
+                <property name="position" fetchPlan="_base"/>
+                <property name="bot" fetchPlan="_base"/>
+            </fetchPlan>
+            <loader id="botSettingsDl"/>
+        </instance>
+    </data>
+    <facets>
+        <dataLoadCoordinator auto="true"/>
+    </facets>
+    <actions>
+        <action id="saveAction" type="detail_saveClose"/>
+        <action id="closeAction" type="detail_close"/>
+    </actions>
+    <layout>
+        <formLayout id="form" dataContainer="botSettingsDc">
+            <responsiveSteps>
+                <responsiveStep minWidth="0" columns="1"/>
+                <responsiveStep minWidth="40em" columns="2"/>
+            </responsiveSteps>
+            <entityPicker id="symbolField" property="symbol">
+                <actions>
+                    <action id="entityLookupAction" type="entity_lookup"/>
+                    <action id="entityClearAction" type="entity_clear"/>
+                </actions>
+            </entityPicker>
+            <select id="tradeTypeField" property="tradeType"/>
+            <textField id="depositField" property="deposit"/>
+            <textField id="leverageField" property="leverage"/>
+            <textField id="overlapPersentField" property="overlapPersent"/>
+            <textField id="ordersQuantityField" property="ordersQuantity"/>
+            <textField id="profitPersentField" property="profitPersent"/>
+            <entityPicker id="positionField" property="position">
+                <actions>
+                    <action id="entityLookupAction" type="entity_lookup"/>
+                    <action id="entityClearAction" type="entity_clear"/>
+                </actions>
+            </entityPicker>
+            <select id="stateField" property="state"/>
+            <entityPicker id="botField" property="bot">
+                <actions>
+                    <action id="entityLookupAction" type="entity_lookup"/>
+                    <action id="entityClearAction" type="entity_clear"/>
+                </actions>
+            </entityPicker>
+        </formLayout>
+        <hbox id="detailActions">
+            <button id="saveAndCloseButton" action="saveAction"/>
+            <button id="closeButton" action="closeAction"/>
+        </hbox>
+    </layout>
+</view>
