@@ -1,5 +1,7 @@
 package ru.javaboys.wootify.entity;
 
+import io.jmix.core.metamodel.annotation.DateTimeFormat;
+
 import io.jmix.core.DeletePolicy;
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.entity.annotation.OnDeleteInverse;
@@ -30,9 +32,11 @@ public class BotEvent {
     private Bot bot;
 
     @Column(name = "CREATED_AT", nullable = false)
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private OffsetDateTime createdAt;
 
     @Column(name = "LAST_OCCURRED_AT", nullable = false)
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private OffsetDateTime lastOccurredAt;
 
     @Column(name = "REPEAT_COUNT", nullable = false)

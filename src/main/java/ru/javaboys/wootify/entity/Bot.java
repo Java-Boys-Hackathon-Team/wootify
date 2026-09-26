@@ -1,5 +1,7 @@
 package ru.javaboys.wootify.entity;
 
+import io.jmix.core.metamodel.annotation.DateTimeFormat;
+
 import io.jmix.core.DeletePolicy;
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.entity.annotation.OnDelete;
@@ -101,6 +103,7 @@ public class Bot {
 
     @CreatedDate
     @Column(name = "CREATED_DATE")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private OffsetDateTime createdDate;
 
     @CreatedBy
@@ -109,6 +112,7 @@ public class Bot {
 
     @LastModifiedDate
     @Column(name = "LAST_MODIFIED_DATE")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private OffsetDateTime lastModifiedDate;
 
 

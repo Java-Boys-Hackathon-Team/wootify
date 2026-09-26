@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <view xmlns="http://jmix.io/schema/flowui/view"
-      xmlns:c="http://jmix.io/schema/flowui/jpql-condition"
       title="msg://botListView.title"
       focusComponent="botsDataGrid">
     <data>
@@ -8,35 +7,32 @@
                     class="ru.javaboys.wootify.entity.Bot">
             <fetchPlan extends="_base">
                 <property name="symbol" fetchPlan="_base"/>
+                <property name="runtime" fetchPlan="_base"/>
             </fetchPlan>
             <loader id="botsDl" readOnly="true">
                 <query>
-                    <![CDATA[select e from Bot e]]>
+                    <![CDATA[select e from Bot e order by e.name]]>
                 </query>
             </loader>
         </collection>
     </data>
     <facets>
         <dataLoadCoordinator auto="true"/>
-        <urlQueryParameters>
-            <genericFilter component="genericFilter"/>
-            <pagination component="pagination"/>
-        </urlQueryParameters>
+        <timer id="refreshTimer" delay="3000" autostart="true" repeating="true"/>
     </facets>
     <actions>
         <action id="selectAction" type="lookup_select"/>
         <action id="discardAction" type="lookup_discard"/>
     </actions>
     <layout>
-        <genericFilter id="genericFilter"
-                       dataLoader="botsDl">
-            <properties include=".*"/>
-        </genericFilter>
+        <hbox id="summaryBox" classNames="bot-summary" alignItems="CENTER">
+            <span id="summaryText"/>
+        </hbox>
         <hbox id="buttonsPanel" classNames="buttons-panel">
             <button id="createButton" action="botsDataGrid.createAction"/>
             <button id="editButton" action="botsDataGrid.editAction"/>
-            <button id="removeButton" action="botsDataGrid.removeAction"/>
-            <simplePagination id="pagination" dataLoader="botsDl"/>
+            <button id="removeButton" text="Удалить" icon="TRASH"/>
+            <button id="eventsButton" text="Журнал ботов" icon="LIST_UL"/>
         </hbox>
         <dataGrid id="botsDataGrid"
                   width="100%"
@@ -46,18 +42,19 @@
             <actions>
                 <action id="createAction" type="list_create"/>
                 <action id="editAction" type="list_edit"/>
-                <action id="removeAction" type="list_remove"/>
             </actions>
             <columns resizable="true">
-                <column property="symbol"/>
-                <column property="name"/>
-                <column property="startDateTime"/>
-                <column property="endDateTime"/>
-                <column property="errorMessage"/>
-                <column property="desiredState"/>
-                <column property="runtimeState"/>
-                <column property="lastHeartBeat"/>
-                <column property="ownerInstance"/>
+                <column property="name" width="16em" flexGrow="0" frozen="true"/>
+                <column key="status" header="Статус" autoWidth="true" flexGrow="0"/>
+                <column key="controls" header="Управление" autoWidth="true" flexGrow="0"/>
+                <column key="activity" header="Текущее занятие" width="26em" flexGrow="3"/>
+                <column key="heartbeat" header="Пульс" autoWidth="true" flexGrow="0"/>
+                <column key="cycles" header="Циклов" autoWidth="true" flexGrow="0"/>
+                <column key="pnl" header="Результат, USDC" autoWidth="true" flexGrow="0"/>
+                <column property="symbol" autoWidth="true" flexGrow="0"/>
+                <column property="tradingMode" autoWidth="true" flexGrow="0"/>
+                <column property="network" autoWidth="true" flexGrow="0"/>
+                <column key="lastError" header="Последняя ошибка" width="18em" flexGrow="2"/>
             </columns>
         </dataGrid>
         <hbox id="lookupActions" visible="false">

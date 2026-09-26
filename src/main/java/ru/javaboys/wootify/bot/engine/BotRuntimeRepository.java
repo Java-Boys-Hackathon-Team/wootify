@@ -243,6 +243,12 @@ public class BotRuntimeRepository {
                 error, statusMessage, botId, instance);
     }
 
+    /** Временные сбои прошли: ошибка больше не актуальна (история остаётся в журнале). */
+    public void clearError(UUID botId, String instance) {
+        jdbc.update("UPDATE BOT_RUNTIME SET LAST_ERROR = NULL, LAST_ERROR_AT = NULL WHERE BOT_ID = ? AND OWNER_INSTANCE = ?",
+                botId, instance);
+    }
+
     public void resetRestartCount(UUID botId, String instance) {
         jdbc.update("UPDATE BOT_RUNTIME SET RESTART_COUNT = 0 WHERE BOT_ID = ? AND OWNER_INSTANCE = ?", botId, instance);
     }

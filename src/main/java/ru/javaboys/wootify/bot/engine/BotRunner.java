@@ -40,6 +40,7 @@ public final class BotRunner implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(BotRunner.class);
     private static final Duration STOP_RETRY_PAUSE = Duration.ofSeconds(2);
+    private static final Duration FIRST_QUOTE_WAIT = Duration.ofSeconds(10);
 
     public record Dependencies(BotLoader loader, StrategyRegistry strategies, ExchangeGatewayFactory gateways,
                         MarketDataService marketData, InstrumentService instruments, BotEventService events,
@@ -98,6 +99,7 @@ public final class BotRunner implements Runnable {
             return;
         }
         d.events().info(botId, EventCategory.LIFECYCLE, startMessage());
+        awaitFirstQuote();
         loop();
     }
 
@@ -113,6 +115,23 @@ public final class BotRunner implements Runnable {
         strategy = provider.create(bot);
         ctx = new DefaultStrategyContext(bot, gateway, d.marketData(), d.instruments(), d.events(), d.runtime(),
                 instance, handle, d.clock());
+    }
+
+    /**
+     * Подписка на цены инструмента оформляется при первом обращении; даём первой котировке прийти,
+     * чтобы старт не начинался с временной ошибки.
+     */
+    private void awaitFirstQuote() {
+        Instant deadline = d.clock().instant().plus(FIRST_QUOTE_WAIT);
+        while (d.marketData().latestQuote(bot.getNetwork(), bot.getSymbol().getWoofiTicker()).isEmpty()
+               && d.clock().instant().isBefore(deadline) && handle.signal() == null) {
+            try {
+                handle.awaitSignal(Duration.ofMillis(250));
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }
     }
 
     private String startMessage() {
@@ -147,6 +166,7 @@ public final class BotRunner implements Runnable {
                 TickResult result = strategy.tick(ctx);
                 if (transientSince != null) {
                     d.events().info(botId, EventCategory.SYSTEM, "Работа восстановлена после временных ошибок");
+                    d.runtime().clearError(botId, instance);
                     transientSince = null;
                 }
                 if (!d.runtime().heartbeat(botId, instance, ctx.statusMessage())) {

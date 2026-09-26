@@ -54,6 +54,8 @@ class BotEngineIntegrationTest {
     BotEventService events;
     @Autowired
     BotRunner.Dependencies dependencies;
+    @Autowired
+    ru.javaboys.wootify.test_support.ManualMarketData marketData;
 
     private final List<BotSupervisor> supervisors = new ArrayList<>();
     private Symbol symbol;
@@ -62,6 +64,7 @@ class BotEngineIntegrationTest {
     void setUp() {
         ScriptedStrategy.reset();
         symbol = BotFixtures.symbol(dataManager, "PERP_TEST_USDC");
+        marketData.setMid(ru.javaboys.wootify.entity.Network.MAINNET, "PERP_TEST_USDC", "100");
     }
 
     @AfterEach
@@ -144,10 +147,16 @@ class BotEngineIntegrationTest {
         script.onTick = n -> n <= 3 ? Outcome.TRANSIENT : Outcome.OK;
 
         control.start(bot.getId());
+        // Пока сбои идут, ошибка видна в состоянии бота.
+        await().atMost(WAIT).until(() -> row(bot).get("LAST_ERROR") != null);
+        assertThat((String) row(bot).get("LAST_ERROR")).contains("Нет цен");
+        assertThat((String) row(bot).get("STATUS_MESSAGE")).startsWith("Ожидание:");
+
         await().atMost(WAIT).until(() -> script.ticks.get() >= 5);
         assertThat(status(bot)).isEqualTo(BotStatus.RUNNING);
         assertThat(script.starts.get()).isEqualTo(1);
-        assertThat((String) row(bot).get("LAST_ERROR")).contains("Нет цен");
+        // После восстановления ошибка снята, история осталась в журнале.
+        assertThat(row(bot).get("LAST_ERROR")).isNull();
 
         Map<String, Object> warning = jdbc.queryForMap(
                 "SELECT LEVEL_, REPEAT_COUNT FROM BOT_EVENT WHERE BOT_ID = ? AND MESSAGE LIKE 'Временная ошибка%'",

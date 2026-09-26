@@ -1,5 +1,7 @@
 package ru.javaboys.wootify.entity;
 
+import io.jmix.core.metamodel.annotation.DateTimeFormat;
+
 import io.jmix.core.DeletePolicy;
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.entity.annotation.OnDeleteInverse;
@@ -41,27 +43,33 @@ public class BotRuntime {
     private String ownerInstance;
 
     @Column(name = "LEASE_UNTIL")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private OffsetDateTime leaseUntil;
 
     @Column(name = "LAST_HEARTBEAT")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private OffsetDateTime lastHeartbeat;
 
     @Column(name = "STARTED_AT")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private OffsetDateTime startedAt;
 
     @Column(name = "STOPPED_AT")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private OffsetDateTime stoppedAt;
 
     @Column(name = "RESTART_COUNT", nullable = false)
     private Integer restartCount;
 
     @Column(name = "NEXT_RESTART_AT")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private OffsetDateTime nextRestartAt;
 
     @Column(name = "LAST_ERROR", length = 4000)
     private String lastError;
 
     @Column(name = "LAST_ERROR_AT")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private OffsetDateTime lastErrorAt;
 
     @Column(name = "STATUS_MESSAGE", length = 1000)
@@ -75,6 +83,7 @@ public class BotRuntime {
     private String strategyState;
 
     @Column(name = "UPDATED_AT")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private OffsetDateTime updatedAt;
 
 

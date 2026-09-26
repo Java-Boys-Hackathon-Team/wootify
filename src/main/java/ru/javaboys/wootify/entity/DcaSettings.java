@@ -1,5 +1,7 @@
 package ru.javaboys.wootify.entity;
 
+import io.jmix.core.metamodel.annotation.NumberFormat;
+
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.metamodel.annotation.JmixEntity;
 import jakarta.persistence.*;
@@ -31,6 +33,7 @@ public class DcaSettings {
     @NotNull
     @Positive
     @Column(name = "DEPOSIT", nullable = false, precision = 19, scale = 8)
+    @NumberFormat(pattern = "#,##0.##")
     private BigDecimal deposit;
 
     @NotNull
@@ -49,23 +52,27 @@ public class DcaSettings {
     @DecimalMin("0.0")
     @DecimalMax("90.0")
     @Column(name = "GRID_RANGE_PERCENT", nullable = false, precision = 9, scale = 4)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal gridRangePercent;
 
     @NotNull
     @DecimalMin("1.0")
     @DecimalMax("5.0")
     @Column(name = "VOLUME_MULTIPLIER", nullable = false, precision = 9, scale = 4)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal volumeMultiplier;
 
     @NotNull
     @DecimalMin(value = "0.0", inclusive = false)
     @DecimalMax("100.0")
     @Column(name = "TAKE_PROFIT_PERCENT", nullable = false, precision = 9, scale = 4)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal takeProfitPercent;
 
     @DecimalMin(value = "0.0", inclusive = false)
     @DecimalMax("100.0")
     @Column(name = "STOP_LOSS_PERCENT", precision = 9, scale = 4)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal stopLossPercent;
 
     @Min(1)

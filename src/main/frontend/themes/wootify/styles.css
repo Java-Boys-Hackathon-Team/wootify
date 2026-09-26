@@ -77,3 +77,51 @@
 .trade-button.sell {
     background-color: #ea3943;
 }
+/* ---------- Боты ---------- */
+.bot-badge {
+    display: inline-block;
+    padding: 0.15em 0.6em;
+    border-radius: var(--lumo-border-radius-l);
+    font-size: var(--lumo-font-size-s);
+    font-weight: 500;
+    white-space: nowrap;
+    background-color: var(--lumo-contrast-10pct);
+    color: var(--lumo-body-text-color);
+}
+.bot-status-running { background-color: var(--lumo-success-color-10pct); color: var(--lumo-success-text-color); }
+.bot-status-starting,
+.bot-status-stopping { background-color: var(--lumo-primary-color-10pct); color: var(--lumo-primary-text-color); }
+.bot-status-suspended,
+.bot-status-restarting { background-color: hsla(40, 100%, 50%, 0.18); color: hsl(35, 100%, 30%); }
+.bot-status-failed { background-color: var(--lumo-error-color-10pct); color: var(--lumo-error-text-color); }
+.bot-status-stopped { background-color: var(--lumo-contrast-10pct); color: var(--lumo-secondary-text-color); }
+
+.bot-level-info { background-color: var(--lumo-contrast-5pct); color: var(--lumo-secondary-text-color); }
+.bot-level-warn { background-color: hsla(40, 100%, 50%, 0.18); color: hsl(35, 100%, 30%); }
+.bot-level-error { background-color: var(--lumo-error-color-10pct); color: var(--lumo-error-text-color); }
+
+.bot-heartbeat-stale,
+.bot-error-text,
+.bot-pnl-negative { color: var(--lumo-error-text-color); }
+.bot-pnl-positive { color: var(--lumo-success-text-color); }
+
+.bot-summary {
+    color: var(--lumo-secondary-text-color);
+    font-size: var(--lumo-font-size-s);
+}
+.bot-header { gap: var(--lumo-space-m); }
+.bot-activity {
+    flex-grow: 1;
+    color: var(--lumo-secondary-text-color);
+}
+.bot-hint,
+.bot-plan-preview {
+    display: block;
+    color: var(--lumo-secondary-text-color);
+    font-size: var(--lumo-font-size-s);
+    margin-top: var(--lumo-space-s);
+}
+.bot-event-details textarea {
+    font-family: var(--lumo-font-family-monospace, monospace);
+    font-size: var(--lumo-font-size-xs);
+}

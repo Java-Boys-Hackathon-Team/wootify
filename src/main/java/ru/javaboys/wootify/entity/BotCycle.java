@@ -1,5 +1,8 @@
 package ru.javaboys.wootify.entity;
 
+import io.jmix.core.metamodel.annotation.NumberFormat;
+import io.jmix.core.metamodel.annotation.DateTimeFormat;
+
 import io.jmix.core.DeletePolicy;
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.entity.annotation.OnDeleteInverse;
@@ -43,42 +46,54 @@ public class BotCycle {
     private String direction;
 
     @Column(name = "STARTED_AT", nullable = false)
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private OffsetDateTime startedAt;
 
     @Column(name = "CLOSED_AT")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private OffsetDateTime closedAt;
 
     @Column(name = "BASE_PRICE", precision = 28, scale = 12)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal basePrice;
 
     @Column(name = "AVG_ENTRY_PRICE", precision = 28, scale = 12)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal avgEntryPrice;
 
     @Column(name = "ENTRY_QTY", nullable = false, precision = 28, scale = 12)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal entryQty;
 
     @Column(name = "ENTRY_COST", nullable = false, precision = 28, scale = 12)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal entryCost;
 
     @Column(name = "EXIT_QTY", nullable = false, precision = 28, scale = 12)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal exitQty;
 
     @Column(name = "EXIT_PROCEEDS", nullable = false, precision = 28, scale = 12)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal exitProceeds;
 
     @Column(name = "FEES", nullable = false, precision = 28, scale = 12)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal fees;
 
     @Column(name = "FILLED_SAFETY_ORDERS", nullable = false)
     private Integer filledSafetyOrders;
 
     @Column(name = "TAKE_PROFIT_PRICE", precision = 28, scale = 12)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal takeProfitPrice;
 
     @Column(name = "STOP_LOSS_PRICE", precision = 28, scale = 12)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal stopLossPrice;
 
     @Column(name = "REALIZED_PNL", precision = 28, scale = 12)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal realizedPnl;
 
     @Column(name = "CLOSE_REASON", length = 32)

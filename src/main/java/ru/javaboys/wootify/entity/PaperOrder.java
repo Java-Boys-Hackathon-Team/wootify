@@ -1,5 +1,8 @@
 package ru.javaboys.wootify.entity;
 
+import io.jmix.core.metamodel.annotation.NumberFormat;
+import io.jmix.core.metamodel.annotation.DateTimeFormat;
+
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.metamodel.annotation.JmixEntity;
 import jakarta.persistence.*;
@@ -38,9 +41,11 @@ public class PaperOrder {
     private String type;
 
     @Column(name = "PRICE", precision = 28, scale = 12)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal price;
 
     @Column(name = "QUANTITY", nullable = false, precision = 28, scale = 12)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal quantity;
 
     @Column(name = "REDUCE_ONLY", nullable = false)
@@ -50,21 +55,26 @@ public class PaperOrder {
     private String status;
 
     @Column(name = "FILLED_QTY", nullable = false, precision = 28, scale = 12)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal filledQty;
 
     @Column(name = "AVG_PRICE", precision = 28, scale = 12)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal avgPrice;
 
     @Column(name = "FEE", nullable = false, precision = 28, scale = 12)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal fee;
 
     @Column(name = "REJECT_REASON", length = 500)
     private String rejectReason;
 
     @Column(name = "CREATED_AT", nullable = false)
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private OffsetDateTime createdAt;
 
     @Column(name = "UPDATED_AT", nullable = false)
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private OffsetDateTime updatedAt;
 
 

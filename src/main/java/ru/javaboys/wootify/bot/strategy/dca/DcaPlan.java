@@ -25,6 +25,10 @@ public final class DcaPlan {
     public record Level(int level, BigDecimal price, BigDecimal quantity) {
     }
 
+    /** Уровень сетки без привязки к цене: смещение от базовой цены (%, со знаком) и стоимость ордера. */
+    public record PreviewLevel(int level, BigDecimal offsetPercent, BigDecimal quoteAmount) {
+    }
+
     private DcaPlan() {
     }
 
@@ -46,6 +50,23 @@ public final class DcaPlan {
 
     static BigDecimal budget(DcaParameters p) {
         return p.deposit().multiply(BigDecimal.valueOf(p.leverage()), MC);
+    }
+
+    /**
+     * Предварительный расчёт сетки для UI: сколько стоит каждый ордер и насколько он отстоит от базовой цены.
+     */
+    public static List<PreviewLevel> preview(DcaParameters p) {
+        List<PreviewLevel> result = new ArrayList<>();
+        List<BigDecimal> weights = weights(p);
+        BigDecimal budget = budget(p);
+        int n = p.ordersCount();
+        for (int i = 0; i < n; i++) {
+            BigDecimal offset = n < 2 ? BigDecimal.ZERO : p.gridRangePercent().multiply(BigDecimal.valueOf(i), MC)
+                    .divide(BigDecimal.valueOf(n - 1), MC);
+            result.add(new PreviewLevel(i, p.isLong() ? offset.negate() : offset,
+                    budget.multiply(weights.get(i), MC).setScale(2, RoundingMode.HALF_UP)));
+        }
+        return result;
     }
 
     /**

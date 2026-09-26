@@ -1,5 +1,8 @@
 package ru.javaboys.wootify.entity;
 
+import io.jmix.core.metamodel.annotation.NumberFormat;
+import io.jmix.core.metamodel.annotation.DateTimeFormat;
+
 import io.jmix.core.DeletePolicy;
 import io.jmix.core.entity.annotation.OnDeleteInverse;
 
@@ -30,12 +33,15 @@ public class Order {
     private UUID id;
 
     @Column(name = "CREATED_DATE")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private LocalDateTime createdDate;
 
     @Column(name = "SENDING_DATE")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private LocalDateTime sendingDate;
 
     @Column(name = "CLOSED_DATE")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private LocalDateTime closedDate;
 
     @JoinColumn(name = "ACCOUNT_ID")
@@ -64,24 +70,30 @@ public class Order {
     private String status;
 
     @Column(name = "QUANTITY", precision = 19, scale = 10)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal quantity;
 
     @Column(name = "PRICE", precision = 19, scale = 10)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal price;
 
     @Column(name = "ORDERLY_ORDER_ID")
     private String orderlyOrderId;
 
     @Column(name = "TOTAL_FEE", precision = 19, scale = 10)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal totalFee;
 
     @Column(name = "AVERAGE_EXECUTED_PRICE", precision = 19, scale = 10)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal averageExecutedPrice;
 
     @Column(name = "TOTAL_EXECUTED_QUANTITY", precision = 19, scale = 10)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal totalExecutedQuantity;
 
     @Column(name = "REALIZED_PNL", precision = 19, scale = 10)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal realizedPnl;
 
     @Column(name = "WOOFI_STATUS")
@@ -269,6 +281,7 @@ public class Order {
     private String errorMessage;
 
     @Column(name = "UPDATED_DATE")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private LocalDateTime updatedDate;
 
     public Bot getBot() {
