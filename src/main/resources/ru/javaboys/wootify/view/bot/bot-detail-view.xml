@@ -1,44 +1,217 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <view xmlns="http://jmix.io/schema/flowui/view"
       title="msg://botDetailView.title"
-      focusComponent="form">
+      focusComponent="nameField">
     <data>
         <instance id="botDc"
                   class="ru.javaboys.wootify.entity.Bot">
             <fetchPlan extends="_base">
                 <property name="symbol" fetchPlan="_base"/>
+                <property name="account" fetchPlan="_base"/>
+                <property name="apiKey" fetchPlan="_base"/>
+                <property name="dcaSettings" fetchPlan="_base"/>
             </fetchPlan>
             <loader id="botDl"/>
+            <instance id="dcaSettingsDc" property="dcaSettings"/>
         </instance>
+        <!-- Состояния у нового бота ещё нет, поэтому оно загружается как коллекция из 0..1 записи -->
+        <collection id="runtimesDc"
+                    class="ru.javaboys.wootify.entity.BotRuntime">
+            <fetchPlan extends="_base"/>
+            <loader id="runtimesDl" readOnly="true">
+                <query>
+                    <![CDATA[select r from BotRuntime r where r.bot = :container_botDc]]>
+                </query>
+            </loader>
+        </collection>
+        <instance id="runtimeDc"
+                  class="ru.javaboys.wootify.entity.BotRuntime">
+            <fetchPlan extends="_base"/>
+        </instance>
+        <collection id="cyclesDc"
+                    class="ru.javaboys.wootify.entity.BotCycle">
+            <fetchPlan extends="_base"/>
+            <loader id="cyclesDl" readOnly="true" maxResults="200">
+                <query>
+                    <![CDATA[select c from BotCycle c where c.bot = :container_botDc order by c.number desc]]>
+                </query>
+            </loader>
+        </collection>
+        <collection id="ordersDc"
+                    class="ru.javaboys.wootify.entity.Order">
+            <fetchPlan extends="_base">
+                <property name="cycle" fetchPlan="_instance_name"/>
+            </fetchPlan>
+            <loader id="ordersDl" readOnly="true" maxResults="300">
+                <query>
+                    <![CDATA[select o from Order_ o where o.bot = :container_botDc order by o.createdDate desc]]>
+                </query>
+            </loader>
+        </collection>
+        <collection id="eventsDc"
+                    class="ru.javaboys.wootify.entity.BotEvent">
+            <fetchPlan extends="_base"/>
+            <loader id="eventsDl" readOnly="true" maxResults="300">
+                <query>
+                    <![CDATA[select e from BotEvent e where e.bot = :container_botDc order by e.lastOccurredAt desc]]>
+                </query>
+            </loader>
+        </collection>
     </data>
     <facets>
         <dataLoadCoordinator auto="true"/>
+        <timer id="refreshTimer" delay="3000" autostart="true" repeating="true"/>
     </facets>
     <actions>
         <action id="saveAction" type="detail_saveClose"/>
         <action id="closeAction" type="detail_close"/>
     </actions>
     <layout>
-        <formLayout id="form" dataContainer="botDc">
-            <responsiveSteps>
-                <responsiveStep minWidth="0" columns="1"/>
-                <responsiveStep minWidth="40em" columns="2"/>
-            </responsiveSteps>
-            <entityPicker id="symbolField" property="symbol">
-                <actions>
-                    <action id="entityLookupAction" type="entity_lookup"/>
-                    <action id="entityClearAction" type="entity_clear"/>
-                </actions>
-            </entityPicker>
-            <textField id="nameField" property="name"/>
-            <dateTimePicker id="startDateTimeField" property="startDateTime"/>
-            <dateTimePicker id="endDateTimeField" property="endDateTime"/>
-            <textArea id="errorMessageField" height="9.5em" property="errorMessage"/>
-            <select id="desiredStateField" property="desiredState"/>
-            <select id="runtimeStateField" property="runtimeState"/>
-            <textField id="lastHeartBeatField" property="lastHeartBeat"/>
-            <textField id="ownerInstanceField" property="ownerInstance"/>
-        </formLayout>
+        <hbox id="headerBox" width="100%" alignItems="CENTER" classNames="bot-header">
+            <hbox id="statusBox" padding="false" spacing="false"/>
+            <span id="activityText" classNames="bot-activity"/>
+            <button id="startButton" text="Запустить" icon="PLAY" themeNames="success primary"/>
+            <button id="stopButton" text="Остановить" icon="STOP" themeNames="error primary"/>
+        </hbox>
+        <span id="readOnlyHint" classNames="bot-hint" visible="false"
+              text="Бот работает. Чтобы изменить настройки, остановите его: изменения применяются при следующем запуске."/>
+        <tabSheet id="tabs" width="100%" height="100%">
+            <tab id="settingsTab" label="Настройки">
+                <vbox padding="false">
+                    <formLayout id="form" dataContainer="botDc">
+                        <responsiveSteps>
+                            <responsiveStep minWidth="0" columns="1"/>
+                            <responsiveStep minWidth="40em" columns="2"/>
+                            <responsiveStep minWidth="70em" columns="3"/>
+                        </responsiveSteps>
+                        <textField id="nameField" property="name"/>
+                        <select id="strategyTypeField" property="strategyType"/>
+                        <entityPicker id="symbolField" property="symbol">
+                            <actions>
+                                <action id="entityLookup" type="entity_lookup"/>
+                            </actions>
+                        </entityPicker>
+                        <select id="tradingModeField" property="tradingMode"/>
+                        <select id="networkField" property="network"/>
+                        <select id="stopActionField" property="stopAction"/>
+                        <entityPicker id="accountField" property="account">
+                            <actions>
+                                <action id="entityLookup" type="entity_lookup"/>
+                                <action id="entityClear" type="entity_clear"/>
+                            </actions>
+                        </entityPicker>
+                        <entityPicker id="apiKeyField" property="apiKey">
+                            <actions>
+                                <action id="entityLookup" type="entity_lookup"/>
+                                <action id="entityClear" type="entity_clear"/>
+                            </actions>
+                        </entityPicker>
+                        <integerField id="tickIntervalSecField" property="tickIntervalSec"/>
+                        <integerField id="maxRestartsField" property="maxRestarts"/>
+                        <textArea id="descriptionField" property="description" colspan="2" height="4em"/>
+                    </formLayout>
+                    <h4 text="Стратегия усреднения (DCA)"/>
+                    <formLayout id="dcaForm" dataContainer="dcaSettingsDc">
+                        <responsiveSteps>
+                            <responsiveStep minWidth="0" columns="1"/>
+                            <responsiveStep minWidth="40em" columns="2"/>
+                            <responsiveStep minWidth="70em" columns="3"/>
+                        </responsiveSteps>
+                        <select id="directionField" property="direction"/>
+                        <bigDecimalField id="depositField" property="deposit"/>
+                        <integerField id="leverageField" property="leverage"/>
+                        <integerField id="ordersCountField" property="ordersCount"/>
+                        <bigDecimalField id="gridRangePercentField" property="gridRangePercent"/>
+                        <bigDecimalField id="volumeMultiplierField" property="volumeMultiplier"/>
+                        <bigDecimalField id="takeProfitPercentField" property="takeProfitPercent"/>
+                        <bigDecimalField id="stopLossPercentField" property="stopLossPercent"/>
+                        <integerField id="maxCyclesField" property="maxCycles"/>
+                        <integerField id="cycleCooldownSecField" property="cycleCooldownSec"/>
+                    </formLayout>
+                    <span id="planPreview" classNames="bot-plan-preview"/>
+                </vbox>
+            </tab>
+            <tab id="stateTab" label="Состояние">
+                <vbox padding="false">
+                    <formLayout id="runtimeForm" dataContainer="runtimeDc">
+                        <responsiveSteps>
+                            <responsiveStep minWidth="0" columns="1"/>
+                            <responsiveStep minWidth="40em" columns="2"/>
+                            <responsiveStep minWidth="70em" columns="3"/>
+                        </responsiveSteps>
+                        <select id="statusField" property="status" readOnly="true"/>
+                        <select id="desiredStateField" property="desiredState" readOnly="true"/>
+                        <textField id="tickCountField" property="tickCount" readOnly="true"/>
+                        <textField id="statusMessageField" property="statusMessage" readOnly="true" colspan="3"/>
+                        <textField id="lastHeartbeatField" property="lastHeartbeat" readOnly="true"/>
+                        <textField id="startedAtField" property="startedAt" readOnly="true"/>
+                        <textField id="stoppedAtField" property="stoppedAt" readOnly="true"/>
+                        <textField id="ownerInstanceField" property="ownerInstance" readOnly="true"/>
+                        <textField id="leaseUntilField" property="leaseUntil" readOnly="true"/>
+                        <textField id="restartCountField" property="restartCount" readOnly="true"/>
+                        <textField id="nextRestartAtField" property="nextRestartAt" readOnly="true"/>
+                        <textField id="lastErrorAtField" property="lastErrorAt" readOnly="true"/>
+                        <textArea id="lastErrorField" property="lastError" readOnly="true" colspan="3" height="8em"/>
+                    </formLayout>
+                </vbox>
+            </tab>
+            <tab id="cyclesTab" label="Циклы">
+                <dataGrid id="cyclesDataGrid" width="100%" height="100%" minHeight="20em" dataContainer="cyclesDc">
+                    <columns resizable="true">
+                        <column property="number" autoWidth="true" flexGrow="0"/>
+                        <column property="status" autoWidth="true" flexGrow="0"/>
+                        <column property="direction" autoWidth="true" flexGrow="0"/>
+                        <column property="startedAt" autoWidth="true"/>
+                        <column property="closedAt" autoWidth="true"/>
+                        <column property="basePrice" autoWidth="true"/>
+                        <column property="avgEntryPrice" autoWidth="true"/>
+                        <column property="entryQty" autoWidth="true"/>
+                        <column property="filledSafetyOrders" autoWidth="true" flexGrow="0"/>
+                        <column property="takeProfitPrice" autoWidth="true"/>
+                        <column property="stopLossPrice" autoWidth="true"/>
+                        <column property="fees" autoWidth="true"/>
+                        <column key="pnl" header="Результат, USDC"/>
+                        <column property="closeReason" autoWidth="true"/>
+                    </columns>
+                </dataGrid>
+            </tab>
+            <tab id="ordersTab" label="Ордера">
+                <dataGrid id="ordersDataGrid" width="100%" height="100%" minHeight="20em" dataContainer="ordersDc">
+                    <columns resizable="true">
+                        <column property="createdDate" autoWidth="true"/>
+                        <column property="cycle" autoWidth="true" flexGrow="0"/>
+                        <column property="role" autoWidth="true"/>
+                        <column property="gridLevel" autoWidth="true" flexGrow="0"/>
+                        <column property="side" autoWidth="true" flexGrow="0"/>
+                        <column property="type" autoWidth="true" flexGrow="0"/>
+                        <column property="price" autoWidth="true"/>
+                        <column property="quantity" autoWidth="true"/>
+                        <column property="status" autoWidth="true"/>
+                        <column property="totalExecutedQuantity" autoWidth="true"/>
+                        <column property="averageExecutedPrice" autoWidth="true"/>
+                        <column property="totalFee" autoWidth="true"/>
+                        <column property="clientOrderId" autoWidth="true"/>
+                        <column property="errorMessage"/>
+                    </columns>
+                </dataGrid>
+            </tab>
+            <tab id="eventsTab" label="Журнал">
+                <vbox padding="false" height="100%">
+                    <dataGrid id="eventsDataGrid" width="100%" minHeight="16em" dataContainer="eventsDc">
+                        <columns resizable="true">
+                            <column property="lastOccurredAt" autoWidth="true" flexGrow="0"/>
+                            <column key="level" header="Уровень" autoWidth="true" flexGrow="0"/>
+                            <column property="category" autoWidth="true" flexGrow="0"/>
+                            <column property="message" flexGrow="5"/>
+                            <column property="repeatCount" autoWidth="true" flexGrow="0"/>
+                        </columns>
+                    </dataGrid>
+                    <textArea id="eventDetailsField" dataContainer="eventsDc" property="details" readOnly="true"
+                              label="Подробности выбранного события" width="100%" height="10em"
+                              classNames="bot-event-details"/>
+                </vbox>
+            </tab>
+        </tabSheet>
         <hbox id="detailActions">
             <button id="saveAndCloseButton" action="saveAction"/>
             <button id="closeButton" action="closeAction"/>

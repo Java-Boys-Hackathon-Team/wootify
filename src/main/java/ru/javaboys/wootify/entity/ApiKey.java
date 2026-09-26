@@ -1,5 +1,7 @@
 package ru.javaboys.wootify.entity;
 
+import ru.javaboys.wootify.security.SecretConverter;
+
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.metamodel.annotation.InstanceName;
 import io.jmix.core.metamodel.annotation.JmixEntity;
@@ -21,7 +23,8 @@ public class ApiKey {
     @Column(name = "KEY_")
     private String key;
 
-    @Column(name = "SECRET")
+    @Convert(converter = SecretConverter.class)
+    @Column(name = "SECRET", length = 1000)
     private String secret;
 
     @Column(name = "EXCHANGE_ID")

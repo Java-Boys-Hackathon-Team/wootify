@@ -1,5 +1,7 @@
 package ru.javaboys.wootify.client;
 
+import org.springframework.web.bind.annotation.RequestHeader;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,9 +13,9 @@ public interface BalanceClient {
 
     @GetMapping("/balance")
     BalanceResponse getBalance(
-            @RequestParam("apiKey") String wooApiKey,
-            @RequestParam("apiSecret") String wooApiSecret,
-            @RequestParam("accountId") String accountId,
-            @RequestParam(value = "env", required = false) String env
+            @RequestHeader("X-Woo-Api-Key") String wooApiKey,
+            @RequestHeader("X-Woo-Api-Secret") String wooApiSecret,
+            @RequestHeader("X-Woo-Account-Id") String accountId,
+            @RequestHeader(value = "X-Woo-Env", required = false) String env
     );
 }

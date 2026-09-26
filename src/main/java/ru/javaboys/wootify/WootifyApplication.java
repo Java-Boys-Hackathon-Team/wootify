@@ -23,7 +23,7 @@ import javax.sql.DataSource;
 @Push
 @Theme(value = "wootify")
 @SpringBootApplication
-@EnableFeignClients(basePackages = "ru.javaboys.wootify.client")
+@EnableFeignClients(basePackages = {"ru.javaboys.wootify.client", "ru.javaboys.wootify.exchange.bridge"})
 public class WootifyApplication implements AppShellConfigurator {
 
     @Autowired

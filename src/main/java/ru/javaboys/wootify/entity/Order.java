@@ -1,5 +1,11 @@
 package ru.javaboys.wootify.entity;
 
+import io.jmix.core.metamodel.annotation.NumberFormat;
+import io.jmix.core.metamodel.annotation.DateTimeFormat;
+
+import io.jmix.core.DeletePolicy;
+import io.jmix.core.entity.annotation.OnDeleteInverse;
+
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.metamodel.annotation.JmixEntity;
 import jakarta.persistence.*;
@@ -13,7 +19,11 @@ import java.util.UUID;
         @Index(name = "IDX_ORDER__ACCOUNT", columnList = "ACCOUNT_ID"),
         @Index(name = "IDX_ORDER__API_KEY_ID", columnList = "API_KEY_ID"),
         @Index(name = "IDX_ORDER__POSITION", columnList = "POSITION_ID"),
-        @Index(name = "IDX_ORDER__SYMBOL", columnList = "SYMBOL_ID")
+        @Index(name = "IDX_ORDER__SYMBOL", columnList = "SYMBOL_ID"),
+        @Index(name = "IDX_ORDER__BOT", columnList = "BOT_ID"),
+        @Index(name = "IDX_ORDER__CYCLE", columnList = "CYCLE_ID")
+}, uniqueConstraints = {
+        @UniqueConstraint(name = "IDX_ORDER__UNQ_CLIENT_ORDER_ID", columnNames = {"CLIENT_ORDER_ID"})
 })
 @Entity(name = "Order_")
 public class Order {
@@ -23,12 +33,15 @@ public class Order {
     private UUID id;
 
     @Column(name = "CREATED_DATE")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private LocalDateTime createdDate;
 
     @Column(name = "SENDING_DATE")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private LocalDateTime sendingDate;
 
     @Column(name = "CLOSED_DATE")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private LocalDateTime closedDate;
 
     @JoinColumn(name = "ACCOUNT_ID")
@@ -57,24 +70,30 @@ public class Order {
     private String status;
 
     @Column(name = "QUANTITY", precision = 19, scale = 10)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal quantity;
 
     @Column(name = "PRICE", precision = 19, scale = 10)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal price;
 
     @Column(name = "ORDERLY_ORDER_ID")
     private String orderlyOrderId;
 
     @Column(name = "TOTAL_FEE", precision = 19, scale = 10)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal totalFee;
 
     @Column(name = "AVERAGE_EXECUTED_PRICE", precision = 19, scale = 10)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal averageExecutedPrice;
 
     @Column(name = "TOTAL_EXECUTED_QUANTITY", precision = 19, scale = 10)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal totalExecutedQuantity;
 
     @Column(name = "REALIZED_PNL", precision = 19, scale = 10)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal realizedPnl;
 
     @Column(name = "WOOFI_STATUS")
@@ -232,4 +251,108 @@ public class Order {
         this.id = id;
     }
 
+
+    @OnDeleteInverse(DeletePolicy.UNLINK)
+    @JoinColumn(name = "BOT_ID")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Bot bot;
+
+    @OnDeleteInverse(DeletePolicy.UNLINK)
+    @JoinColumn(name = "CYCLE_ID")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private BotCycle cycle;
+
+    @Column(name = "CLIENT_ORDER_ID", length = 64)
+    private String clientOrderId;
+
+    @Column(name = "ROLE_", length = 16)
+    private String role;
+
+    @Column(name = "GRID_LEVEL")
+    private Integer gridLevel;
+
+    @Column(name = "TRADING_MODE", length = 16)
+    private String tradingMode;
+
+    @Column(name = "REDUCE_ONLY")
+    private Boolean reduceOnly;
+
+    @Column(name = "ERROR_MESSAGE", length = 1000)
+    private String errorMessage;
+
+    @Column(name = "UPDATED_DATE")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
+    private LocalDateTime updatedDate;
+
+    public Bot getBot() {
+        return bot;
+    }
+
+    public void setBot(Bot bot) {
+        this.bot = bot;
+    }
+
+    public BotCycle getCycle() {
+        return cycle;
+    }
+
+    public void setCycle(BotCycle cycle) {
+        this.cycle = cycle;
+    }
+
+    public String getClientOrderId() {
+        return clientOrderId;
+    }
+
+    public void setClientOrderId(String clientOrderId) {
+        this.clientOrderId = clientOrderId;
+    }
+
+    public OrderRole getRole() {
+        return role == null ? null : OrderRole.fromId(role);
+    }
+
+    public void setRole(OrderRole role) {
+        this.role = role == null ? null : role.getId();
+    }
+
+    public Integer getGridLevel() {
+        return gridLevel;
+    }
+
+    public void setGridLevel(Integer gridLevel) {
+        this.gridLevel = gridLevel;
+    }
+
+    public TradingMode getTradingMode() {
+        return tradingMode == null ? null : TradingMode.fromId(tradingMode);
+    }
+
+    public void setTradingMode(TradingMode tradingMode) {
+        this.tradingMode = tradingMode == null ? null : tradingMode.getId();
+    }
+
+    public Boolean getReduceOnly() {
+        return reduceOnly;
+    }
+
+    public void setReduceOnly(Boolean reduceOnly) {
+        this.reduceOnly = reduceOnly;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
+    public LocalDateTime getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(LocalDateTime updatedDate) {
+        this.updatedDate = updatedDate;
+    }
 }

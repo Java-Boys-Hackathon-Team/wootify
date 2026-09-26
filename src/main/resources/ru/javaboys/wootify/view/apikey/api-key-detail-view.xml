@@ -32,7 +32,7 @@
                 </actions>
             </entityPicker>
             <textField id="keyField" property="key"/>
-            <textField id="secretField" property="secret"/>
+            <passwordField id="secretField" property="secret" revealButtonVisible="true"/>
             <textField id="exchangeIdField" property="exchangeId"/>
             <textField id="brokerIdField" property="brokerId"/>
             <textField id="envField" property="env"/>

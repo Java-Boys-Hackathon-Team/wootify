@@ -1,0 +1,11 @@
+.git
+.gradle
+.idea
+build
+node_modules
+src/main/frontend/generated
+src/main/bundles
+woofipro-bridge
+postgres
+*.log
+.env

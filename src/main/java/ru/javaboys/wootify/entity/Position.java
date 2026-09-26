@@ -1,5 +1,8 @@
 package ru.javaboys.wootify.entity;
 
+import io.jmix.core.metamodel.annotation.NumberFormat;
+import io.jmix.core.metamodel.annotation.DateTimeFormat;
+
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.metamodel.annotation.JmixEntity;
 import jakarta.persistence.*;
@@ -33,6 +36,7 @@ public class Position {
     private Account account;
 
     @Column(name = "CREATED_DATE")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private LocalDateTime createdDate;
 
     @JoinColumn(name = "SYMBOL_ID")
@@ -40,30 +44,24 @@ public class Position {
     private Symbol symbol;
 
     @Column(name = "CLOSED_DATE")
+    @DateTimeFormat("dd.MM.yyyy HH:mm:ss")
     private LocalDateTime closedDate;
 
     @Column(name = "LEVERAGE")
     private Double leverage;
 
     @Column(name = "POSITION_QTY", precision = 19, scale = 10)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal positionQty;
 
     @Column(name = "AVERAGE_OPEN_PRICE", precision = 19, scale = 10)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal averageOpenPrice;
 
     @Column(name = "REALIZED_PNL", precision = 19, scale = 10)
+    @NumberFormat(pattern = "#,##0.########")
     private BigDecimal realizedPnl;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "position")
-    private BotSettings botSettings;
-
-    public BotSettings getBotSettings() {
-        return botSettings;
-    }
-
-    public void setBotSettings(BotSettings botSettings) {
-        this.botSettings = botSettings;
-    }
 
     public void setLeverage(Double leverage) {
         this.leverage = leverage;

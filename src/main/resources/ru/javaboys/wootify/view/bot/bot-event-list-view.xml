@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://botEventListView.title"
+      focusComponent="eventsDataGrid">
+    <data>
+        <collection id="eventsDc"
+                    class="ru.javaboys.wootify.entity.BotEvent">
+            <fetchPlan extends="_base">
+                <property name="bot" fetchPlan="_instance_name"/>
+            </fetchPlan>
+            <loader id="eventsDl" readOnly="true">
+                <query>
+                    <![CDATA[select e from BotEvent e order by e.lastOccurredAt desc]]>
+                </query>
+            </loader>
+        </collection>
+    </data>
+    <facets>
+        <dataLoadCoordinator auto="true"/>
+        <urlQueryParameters>
+            <genericFilter component="genericFilter"/>
+            <pagination component="pagination"/>
+        </urlQueryParameters>
+        <timer id="refreshTimer" delay="5000" autostart="true" repeating="true"/>
+    </facets>
+    <layout>
+        <genericFilter id="genericFilter" dataLoader="eventsDl">
+            <properties include="bot|level|category|message|createdAt|lastOccurredAt"/>
+        </genericFilter>
+        <hbox id="buttonsPanel" classNames="buttons-panel">
+            <simplePagination id="pagination" dataLoader="eventsDl" itemsPerPageDefaultValue="100"/>
+        </hbox>
+        <dataGrid id="eventsDataGrid"
+                  width="100%"
+                  height="100%"
+                  minHeight="20em"
+                  dataContainer="eventsDc">
+            <columns resizable="true">
+                <column property="lastOccurredAt" autoWidth="true" flexGrow="0"/>
+                <column property="bot" flexGrow="1"/>
+                <column key="level" header="Уровень" autoWidth="true" flexGrow="0"/>
+                <column property="category" autoWidth="true" flexGrow="0"/>
+                <column property="message" flexGrow="5"/>
+                <column property="repeatCount" autoWidth="true" flexGrow="0"/>
+                <column property="createdAt" autoWidth="true" flexGrow="0"/>
+            </columns>
+        </dataGrid>
+        <textArea id="detailsField"
+                  dataContainer="eventsDc"
+                  property="details"
+                  label="Подробности выбранного события"
+                  readOnly="true"
+                  width="100%"
+                  height="12em"
+                  classNames="bot-event-details"/>
+    </layout>
+</view>
