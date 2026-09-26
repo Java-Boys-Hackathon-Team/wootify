@@ -14,14 +14,19 @@
             <loader id="botDl"/>
             <instance id="dcaSettingsDc" property="dcaSettings"/>
         </instance>
-        <instance id="runtimeDc"
-                  class="ru.javaboys.wootify.entity.BotRuntime">
+        <!-- Состояния у нового бота ещё нет, поэтому оно загружается как коллекция из 0..1 записи -->
+        <collection id="runtimesDc"
+                    class="ru.javaboys.wootify.entity.BotRuntime">
             <fetchPlan extends="_base"/>
-            <loader id="runtimeDl" readOnly="true">
+            <loader id="runtimesDl" readOnly="true">
                 <query>
                     <![CDATA[select r from BotRuntime r where r.bot = :container_botDc]]>
                 </query>
             </loader>
+        </collection>
+        <instance id="runtimeDc"
+                  class="ru.javaboys.wootify.entity.BotRuntime">
+            <fetchPlan extends="_base"/>
         </instance>
         <collection id="cyclesDc"
                     class="ru.javaboys.wootify.entity.BotCycle">

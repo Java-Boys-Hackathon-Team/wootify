@@ -14,7 +14,7 @@ import io.jmix.flowui.kit.component.button.JmixButton;
 import io.jmix.flowui.model.CollectionLoader;
 import io.jmix.flowui.model.DataContext;
 import io.jmix.flowui.model.InstanceContainer;
-import io.jmix.flowui.model.InstanceLoader;
+import io.jmix.flowui.model.CollectionContainer;
 import io.jmix.flowui.view.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.javaboys.wootify.bot.engine.BotControlService;
@@ -41,7 +41,9 @@ public class BotDetailView extends StandardDetailView<Bot> {
     @ViewComponent
     private InstanceContainer<BotRuntime> runtimeDc;
     @ViewComponent
-    private InstanceLoader<BotRuntime> runtimeDl;
+    private CollectionLoader<BotRuntime> runtimesDl;
+    @ViewComponent
+    private CollectionContainer<BotRuntime> runtimesDc;
     @ViewComponent
     private CollectionLoader<BotCycle> cyclesDl;
     @ViewComponent
@@ -92,6 +94,11 @@ public class BotDetailView extends StandardDetailView<Bot> {
         bot.setDcaSettings(settings);
     }
 
+    @Subscribe(id = "runtimesDc", target = Target.DATA_CONTAINER)
+    public void onRuntimesDcCollectionChange(CollectionContainer.CollectionChangeEvent<BotRuntime> event) {
+        runtimeDc.setItem(runtimesDc.getItems().isEmpty() ? null : runtimesDc.getItems().getFirst());
+    }
+
     @Subscribe
     public void onReady(ReadyEvent event) {
         dcaSettingsDc.addItemPropertyChangeListener(e -> updatePlanPreview());
@@ -104,7 +111,7 @@ public class BotDetailView extends StandardDetailView<Bot> {
         if (entityStates.isNew(getEditedEntity())) {
             return;
         }
-        runtimeDl.load();
+        runtimesDl.load();
         cyclesDl.load();
         ordersDl.load();
         eventsDl.load();
@@ -184,7 +191,7 @@ public class BotDetailView extends StandardDetailView<Bot> {
     }
 
     private void refreshNow() {
-        runtimeDl.load();
+        runtimesDl.load();
         updateState();
     }
 
