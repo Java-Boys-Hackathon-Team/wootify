@@ -14,9 +14,9 @@ public interface PositionClient {
     PositionsResponse getPositions(
             @RequestParam(value = "symbol", required = false) String symbol,
             @RequestParam(value = "only_open", required = false) Boolean onlyOpen,
-            @RequestParam("apiKey") String wooApiKey,
-            @RequestParam("apiSecret") String wooApiSecret,
-            @RequestParam("accountId") String accountId,
-            @RequestParam(value = "env", required = false) String env
+            @RequestHeader("X-Woo-Api-Key") String wooApiKey,
+            @RequestHeader("X-Woo-Api-Secret") String wooApiSecret,
+            @RequestHeader("X-Woo-Account-Id") String accountId,
+            @RequestHeader(value = "X-Woo-Env", required = false) String env
     );
 }

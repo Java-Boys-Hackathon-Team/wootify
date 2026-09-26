@@ -173,7 +173,8 @@ public class PositionServiceImpl implements PositionService {
                 .symbol(position.getSymbol())
                 .orderType(OrderType.MARKET)
                 .orderSide(contractsQuantity >= 0 ? OrderSide.SELL : OrderSide.BUY)
-                .quantity(BigDecimal.valueOf(contractsQuantity))
+                // Направление задаёт сторона ордера, объём всегда положительный (для SHORT contracts < 0).
+                .quantity(BigDecimal.valueOf(contractsQuantity).abs())
                 .build();
 
         CurrentAccountState accountState = CurrentAccountState.builder()

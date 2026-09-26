@@ -19,10 +19,10 @@ public interface OrderClient {
 
     @PostMapping(value = "/order", consumes = "application/json")
     OrderResponse createOrder(
-            @RequestParam("apiKey") String wooApiKey,
-            @RequestParam("apiSecret") String wooApiSecret,
-            @RequestParam("accountId") String accountId,
-            @RequestParam(value = "env", required = false) String env,
+            @RequestHeader("X-Woo-Api-Key") String wooApiKey,
+            @RequestHeader("X-Woo-Api-Secret") String wooApiSecret,
+            @RequestHeader("X-Woo-Account-Id") String accountId,
+            @RequestHeader(value = "X-Woo-Env", required = false) String env,
             @RequestBody OrderRequest body
     );
 
@@ -30,20 +30,20 @@ public interface OrderClient {
     OrderDetailResponse getOrderById(
             @PathVariable("orderId") String orderId,
             @RequestParam("symbol") String symbol,
-            @RequestParam("apiKey") String wooApiKey,
-            @RequestParam("apiSecret") String wooApiSecret,
-            @RequestParam("accountId") String accountId,
-            @RequestParam(value = "env", required = false) String env
+            @RequestHeader("X-Woo-Api-Key") String wooApiKey,
+            @RequestHeader("X-Woo-Api-Secret") String wooApiSecret,
+            @RequestHeader("X-Woo-Account-Id") String accountId,
+            @RequestHeader(value = "X-Woo-Env", required = false) String env
     );
 
     @PostMapping("/cancel")
     OrderCancelResponse cancelOrder(
             @RequestParam("symbol") String symbol,
             @RequestParam("order_id") String orderId,
-            @RequestParam("apiKey") String wooApiKey,
-            @RequestParam("apiSecret") String wooApiSecret,
-            @RequestParam("accountId") String accountId,
-            @RequestParam(value = "env", required = false) String env
+            @RequestHeader("X-Woo-Api-Key") String wooApiKey,
+            @RequestHeader("X-Woo-Api-Secret") String wooApiSecret,
+            @RequestHeader("X-Woo-Account-Id") String accountId,
+            @RequestHeader(value = "X-Woo-Env", required = false) String env
     );
 
     @GetMapping("/orders")
@@ -52,10 +52,10 @@ public interface OrderClient {
             @RequestParam(value = "symbol", required = false) String symbol,
             @RequestParam(value = "limit", required = false) Integer limit,
             @RequestParam(value = "since", required = false) Long since,
-            @RequestParam("apiKey") String wooApiKey,
-            @RequestParam("apiSecret") String wooApiSecret,
-            @RequestParam("accountId") String accountId,
-            @RequestParam(value = "env", required = false) String env
+            @RequestHeader("X-Woo-Api-Key") String wooApiKey,
+            @RequestHeader("X-Woo-Api-Secret") String wooApiSecret,
+            @RequestHeader("X-Woo-Account-Id") String accountId,
+            @RequestHeader(value = "X-Woo-Env", required = false) String env
     );
 
 }

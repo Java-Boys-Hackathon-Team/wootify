@@ -1,5 +1,7 @@
 package ru.javaboys.wootify.client;
 
+import org.springframework.web.bind.annotation.RequestHeader;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,20 +19,20 @@ public interface LeverageClient {
     @PutMapping(value = "/positions/{symbol}/leverage", consumes = "application/json")
     LeverageResponse setLeverage(
             @PathVariable("symbol") String symbol,
-            @RequestParam("apiKey") String wooApiKey,
-            @RequestParam("apiSecret") String wooApiSecret,
-            @RequestParam("accountId") String accountId,
-            @RequestParam(value = "env", required = false) String env,
+            @RequestHeader("X-Woo-Api-Key") String wooApiKey,
+            @RequestHeader("X-Woo-Api-Secret") String wooApiSecret,
+            @RequestHeader("X-Woo-Account-Id") String accountId,
+            @RequestHeader(value = "X-Woo-Env", required = false) String env,
             @RequestBody LeverageRequest body
     );
 
     @GetMapping(value = "/positions/{symbol}/leverage", produces = "application/json")
     LeverageGetResponse getLeverage(
             @PathVariable("symbol") String symbol,
-            @RequestParam("apiKey") String wooApiKey,
-            @RequestParam("apiSecret") String wooApiSecret,
-            @RequestParam("accountId") String accountId,
-            @RequestParam(value = "brokerId", required = false) String brokerId,
-            @RequestParam(value = "env", required = false) String env
+            @RequestHeader("X-Woo-Api-Key") String wooApiKey,
+            @RequestHeader("X-Woo-Api-Secret") String wooApiSecret,
+            @RequestHeader("X-Woo-Account-Id") String accountId,
+            @RequestHeader(value = "X-Woo-Broker-Id", required = false) String brokerId,
+            @RequestHeader(value = "X-Woo-Env", required = false) String env
     );
 }
