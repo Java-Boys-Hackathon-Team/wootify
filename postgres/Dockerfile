@@ -1,4 +1,4 @@
-FROM postgres:latest
+FROM postgres:16
 
 RUN apt update && \
     apt install dos2unix -y
