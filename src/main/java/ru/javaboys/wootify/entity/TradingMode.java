@@ -5,15 +5,14 @@ import io.jmix.core.metamodel.datatype.EnumClass;
 import org.springframework.lang.Nullable;
 
 
-public enum BotSettingsState implements EnumClass<String> {
+public enum TradingMode implements EnumClass<String> {
 
-    INACTIVE("INACTIVE"),
-    ACTIVE("ACTIVE"),
-    FINAL("FINAL");
+    PAPER("PAPER"),
+    LIVE("LIVE");
 
     private final String id;
 
-    BotSettingsState(String id) {
+    TradingMode(String id) {
         this.id = id;
     }
 
@@ -22,8 +21,8 @@ public enum BotSettingsState implements EnumClass<String> {
     }
 
     @Nullable
-    public static BotSettingsState fromId(String id) {
-        for (BotSettingsState at : BotSettingsState.values()) {
+    public static TradingMode fromId(String id) {
+        for (TradingMode at : TradingMode.values()) {
             if (at.getId().equals(id)) {
                 return at;
             }

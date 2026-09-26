@@ -54,16 +54,6 @@ public class Position {
     @Column(name = "REALIZED_PNL", precision = 19, scale = 10)
     private BigDecimal realizedPnl;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "position")
-    private BotSettings botSettings;
-
-    public BotSettings getBotSettings() {
-        return botSettings;
-    }
-
-    public void setBotSettings(BotSettings botSettings) {
-        this.botSettings = botSettings;
-    }
 
     public void setLeverage(Double leverage) {
         this.leverage = leverage;

@@ -5,17 +5,17 @@ import io.jmix.core.metamodel.datatype.EnumClass;
 import org.springframework.lang.Nullable;
 
 
-public enum RuntimeState implements EnumClass<String> {
+public enum EventCategory implements EnumClass<String> {
 
-    WAIT_RUNNING("WAIT_RUNNING"),
-    RUNNING("RUNNING"),
-    WAIT_STOPPED("WAIT_STOPPED"),
-    STOPPED("STOPPED"),
-    ERROR("ERROR");
+    LIFECYCLE("LIFECYCLE"),
+    ORDER("ORDER"),
+    CYCLE("CYCLE"),
+    MARKET("MARKET"),
+    SYSTEM("SYSTEM");
 
     private final String id;
 
-    RuntimeState(String id) {
+    EventCategory(String id) {
         this.id = id;
     }
 
@@ -24,8 +24,8 @@ public enum RuntimeState implements EnumClass<String> {
     }
 
     @Nullable
-    public static RuntimeState fromId(String id) {
-        for (RuntimeState at : RuntimeState.values()) {
+    public static EventCategory fromId(String id) {
+        for (EventCategory at : EventCategory.values()) {
             if (at.getId().equals(id)) {
                 return at;
             }
